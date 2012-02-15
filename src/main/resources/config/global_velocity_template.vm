@@ -1,0 +1,5 @@
+#macro( rootUrl $userurl )#if($springMacroRequestContext.getContextPath()=='')${userurl}#else$springMacroRequestContext.getContextPath()${userurl}#end#end
+
+#macro( dateFormat $date_d)$!dateTool.format('yyyy-MM-dd', $date_d)#end
+
+#macro( timeFormat $date_d)$!dateTool.format('yyyy-MM-dd HH:mm:ss', $date_d)#end

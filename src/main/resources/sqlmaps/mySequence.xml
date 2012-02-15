@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rainy.billing.dao.impl.MySequenceDaoImpl" >
+
+    <resultMap type="MySequence" id="MySequence">
+    	<id property="id" column="id"/>
+    	<result property="sequence" column="sequence"/>
+    	<result property="name" column="name"/>
+    	<result property="updatedAt" column="updated_at"/>
+	</resultMap>
+
+	<insert id="createEntity" parameterType="MySequence">
+		insert into bl_my_sequence(id,sequence,name) 
+		values(#{id},#{sequence},#{name});
+	</insert>
+	
+	<select id="getEntityByName" parameterType="string" resultMap="MySequence">
+		select * from bl_my_sequence where name = #{value} limit 1
+	</select>
+	
+	<update id="updateEntity" parameterType="MySequence">
+		update bl_my_sequence
+		<set>
+			<if test="sequence!=null">
+				sequence = #{sequence},
+			</if>
+			updated_at = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<select id="getSequence" parameterType="map" resultType="Long">
+		select getnextvalue(#{name}, #{size});
+	</select>
+</mapper>

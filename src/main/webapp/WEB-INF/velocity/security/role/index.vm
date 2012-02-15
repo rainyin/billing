@@ -1,0 +1,134 @@
+<div class="tabContent">
+	<table id="bl_role_navgrid">
+		<tr><td/></tr>
+	</table> 
+	<div id="bl_role_pagernav"></div> 
+</div>
+<script type="text/javascript">
+registerNamespace("bl_role");
+bl_role.query_url = APP_PATH + "/security/role/list.do";
+bl_role.oper_url = APP_PATH + "/security/role/operate.do";
+bl_role.allRight_url = APP_PATH + "/security/role/allRight.do";
+bl_role.associateRight_url = APP_PATH + "/security/role/associateRight.do";
+	
+bl_role.initMultiselectDialog = function(){
+	bl_role.multiselectDialog = new MultiselectDialog({
+		   gridId: 'bl_role_navgrid',
+		   container: 'bl_role_multiselect_right',
+		   paramHiddenName: 'roleId',
+		   paramSelectName: 'rightId',
+		   attrSelectSize: 16,
+		   width: 600,
+		   height: 400,
+		   remindTitle: '请选择角色!',
+		   popupTitle: '关联权限',
+		   getItemUrl: bl_role.allRight_url,
+		   submitUrl: bl_role.associateRight_url
+	});
+}
+
+$().ready(function(){
+	bl_role.initMultiselectDialog();
+	bl_role.mygrid = $("#bl_role_navgrid").jqGrid( {
+		url : bl_role.query_url,
+		datatype : 'xml',
+		mtype : 'GET',
+		colNames : [ ' ', '名称', '备注', '创建日期' ],
+		colModel : [ {
+			name : 'id',
+			index : 'id',
+			hidden : true,
+			width : 100,
+			editable : true,
+			editoptions : {
+				defaultValue : ''
+			}
+		}, {
+			name : 'name',
+			index : 'name',
+			width : 200,
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true
+			}
+		}, {
+			name : 'memo',
+			index : 'memo',
+			width : 350,
+			sortable : false,
+			editable : true,
+			edittype : 'textarea',
+			editoptions : {
+				rows : "2",
+				cols : "25"
+			}
+		}, {
+			name : 'createdAt',
+			index : 'createdAt',
+			width : 200,
+			search : false,
+			editable : false,
+			formatter : 'datetime'
+		} ],
+		pager : '#bl_role_pagernav',
+		rowNum : 10,
+		rowList : [ 10, 20, 30 ],
+		sortname : 'id',
+		rownumbers : true,
+		sortorder : 'desc',
+		multiselect : false,
+		viewrecords : true,
+		gridview : true,
+		caption : '客户管理',
+		editurl : bl_role.oper_url,
+		height : 300
+	});
+	$("#bl_role_navgrid").jqGrid('navGrid', '#bl_role_pagernav', 
+			{
+				search : false
+			}, 
+			{
+				reloadAfterSubmit : false,
+				recreateForm: true
+			}, 
+			{
+				reloadAfterSubmit : true,
+				recreateForm: true
+			}, 
+			{
+				reloadAfterSubmit : true
+			}, 
+			{
+				multipleSearch : false
+			} 
+			);
+	bl_role.mygrid.filterToolbar( {} );
+	$("#bl_role_navgrid").jqGrid('navButtonAdd', '#bl_role_pagernav', {
+		caption : "开关",
+		title : "开或关搜索栏",
+		onClickButton : function() {
+			$("#bl_role_navgrid")[0].toggleToolbar();
+		}
+	});
+	$("#bl_role_navgrid").jqGrid('navButtonAdd', '#bl_role_pagernav', {
+		caption : "清空",
+		title : "清空搜索栏",
+		onClickButton : function() {
+			$("#bl_role_navgrid")[0].clearToolbar();
+		}
+	});
+	$("#bl_role_navgrid").jqGrid('navButtonAdd', '#bl_role_pagernav', {
+		caption : "关联权限",
+		title : "关联权限",
+		onClickButton : function() {
+			bl_role.multiselectDialog.onClickFunc();
+		}
+	});
+});
+
+</script>
+
+<div id="bl_role_multiselect_right"></div>

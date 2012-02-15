@@ -1,0 +1,219 @@
+body {
+	font-size: 12px;
+	margin: 0px;
+	padding: 0px;
+	background-color: #eeefff;
+}
+
+html,body,div,td {
+	font-size: 12px;
+}
+
+#container {
+	width: 1280px;
+	height: auto;
+	margin: 0px auto;
+}
+
+#topArea {
+	background-color: #507AAA;
+	color: #F8F8F8;
+	width: 100%;
+	height: 80px;
+	margin: 0;
+	padding: 0;
+}
+
+#topArea .title {
+	height: 65%;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+}
+
+#topArea .loginInfo {
+	height: 20%;
+	width: 300px;
+	padding: 0;
+	margin: 0;
+	float: right;
+	text-align: right;
+}
+#topArea font {
+	color: white;
+	margin-left: 10px;
+}
+
+#topArea a {
+	color: white;
+	text-decoration: none;
+}
+
+#topArea h1 {
+	font-size: 26px;
+	margin: 0 0 0 10px;
+	padding: 0;
+	width: 300px;
+	float:left;
+	font-family: "Trebuchet MS", Verdana, sans-serif;
+	text-align: left;
+}
+#topArea .mainMenu {
+	height: 35%;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+	background-color: #bbbeee;
+}
+#topArea .mainMenu .item {
+	height: 100%;
+	width: 13%;
+	padding: 2px 0 0;
+	margin: 0;
+	float: left;
+	border-right: 1px solid #eeefff;
+	text-align: center;
+}
+
+#topArea .mainMenu .item a {
+	padding: 0;
+	margin: 0;
+	font-size: 15;
+	font-weight: bold;
+}
+
+#contentArea {
+	width: 100%;
+	margin-top: 2px;
+	height: 575px;
+}
+
+#leftMenu {
+	float: left;
+	width: 15%;
+	height: 100%;
+	margin-right: 2px;
+}
+
+#leftMenu ul {
+	line-height: 1.5em;
+	list-style-type: none;
+	width: 95%;
+	margin: 0px;
+	padding: 0px;
+}
+
+#leftMenu ul li {
+	margin-top: 10px;
+	margin-left: 0px;
+}
+
+#leftMenu ul li a {
+	background: none no-repeat scroll 0 0 transparent;
+	color: #112233;
+	text-decoration: none;
+	font-size: 13px;
+}
+
+ul li {
+	margin: 0px;
+	padding: 0px;
+	margin-bottom: 0.1em;
+}
+
+#rightContent {
+	float: left;
+	width: 84.5%;
+	height: 100%;
+	background-color: white;
+	margin-left: 2px;
+}
+
+
+#tabs {
+	margin: 0;
+	height: 99%;
+}
+
+#tabs .ui-tabs-selected a span {
+	padding-right: 10px;
+}
+
+#tabs .ui-tabs-close {
+	display: none;
+	position: absolute;
+	top: 3px;
+	right: 0px;
+	z-index: 800;
+	width: 16px;
+	height: 14px;
+	cursor: pointer;
+}
+
+#tabs .ui-tabs-selected .ui-tabs-close {
+	display: block;
+}
+
+#tabs .tabContent {
+	height: 86%;
+}
+
+#tabs li .ui-icon-close {
+	float: left;
+	margin: 0.4em 0.2em 0 0;
+	cursor: pointer;
+}
+
+.formItem {
+	width: 100%;
+	height: 30px;
+	text-align: left;
+	padding: 2px;
+	margin-top: 2px;
+	float: left;
+}
+
+.formItem .label {
+	width: 80px;
+	padding-left: 10px;
+	float: left;
+}
+
+.formItem .item {
+	width: 160px;
+	float: left;
+}
+
+.formItem input {
+	border: 1px solid #aaaaaa;
+}
+
+.formItem textarea {
+	border: 1px solid #aaaaaa;
+}
+
+.userInfo {
+	float: left;
+	width: 270px;
+	padding-top: 2px;
+	height: 300px;
+	margin-right: 1px;
+}
+
+.userInfoSubmit {
+	width: 602px;
+	height: 30px;
+	clear: both;
+}
+
+.userInfoSubmit .button {
+	float: left;
+	width: 100px;
+	padding: 2px;
+	text-align: center;
+}
+
+.required {
+	color: red;
+	padding-left: 2px;
+}

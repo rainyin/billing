@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rainy.billing.dao.impl.BlacklistDaoImpl" >
+
+    <resultMap type="Blacklist" id="Blacklist">
+		<id property="id" column="id"/>
+		<result property="createdAt" column="created_at"/>
+		<result property="updatedAt" column="updated_at"/>
+		<result property="operatorId" column="operator_id"/>
+		<result property="phoneNumber" column="phone_number"/>
+		<result property="memo" column="memo"/>
+	</resultMap>
+
+	<select id="getEntityById" parameterType="long" resultMap="Blacklist">
+		select *
+		from bl_blacklist where id = #{value}
+	</select>
+	
+	<delete id="deleteEntityById" parameterType="long">
+		delete from bl_blacklist where id = #{value}
+	</delete>
+	
+	<delete id="deleteEntityBatch" >
+		delete from bl_blacklist where id in
+		<foreach collection="array" item="id" open="(" close=")" separator=",">
+		#{id}
+		</foreach>
+	</delete>
+	
+	<update id="updateEntity" parameterType="Blacklist">
+		update bl_blacklist
+		<set>
+			<if test="phoneNumber!=null">
+				phone_number = #{phoneNumber},
+			</if>
+				memo = #{memo},
+			<if test="operatorId!=null">
+				operator_id = #{operatorId},
+			</if>
+			updated_at = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<insert id="createEntity" parameterType="Blacklist" useGeneratedKeys="true" keyProperty="id">
+		insert into bl_blacklist
+		(created_at, updated_at, phone_number, memo, operator_id) 
+		values 
+		(now(), now(), #{phoneNumber}, #{memo}, #{operatorId})
+	</insert>
+	
+	<select id="pageQueryEntityCount" parameterType="BlacklistVo" resultType="long">
+		select count(*) as num
+		<include refid="queryEntitySql"/>
+	</select>
+	
+	<select id="pageQueryEntity" parameterType="BlacklistVo" resultMap="Blacklist">
+		select *
+		<include refid="queryEntitySql"/>
+		<include refid="Common.pagingSql"/>
+	</select>
+	
+	<select id="queryEntity" parameterType="map" resultMap="Blacklist">
+		select *
+		<include refid="queryEntitySql"/>
+	</select>
+	
+	<sql id="queryEntitySql">
+		from bl_blacklist as tt
+		<where>
+			<if test="phoneNumber!=null">
+				and phone_number like concat('%', #{phoneNumber}, '%')
+			</if>
+			<if test="memo!=null">
+				and memo like concat('%', #{memo}, '%')
+			</if>
+		</where>
+	</sql>
+	
+	
+</mapper>

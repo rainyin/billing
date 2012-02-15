@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rainy.billing.dao.impl.ProjectDaoImpl" >
+
+    <resultMap type="Project" id="Project">
+		<id property="id" column="id"/>
+		<result property="createdAt" column="created_at"/>
+		<result property="updatedAt" column="updated_at"/>
+		<result property="operatorId" column="operator_id"/>
+		
+		<result property="name" column="name"/>
+		<result property="customerName" column="customer_name"/>
+		<result property="customerId" column="customer_id"/>
+		<result property="status" column="status"/>
+		<result property="cellphoneSchema" column="cellphone_schema"/>
+		<result property="cellphoneResolution" column="cellphone_resolution"/>
+		<result property="keyboard" column="keyboard"/>
+		<result property="touch" column="touch"/>
+		<result property="shieldSms" column="shield_sms"/>
+		<result property="monthlyFee" column="monthly_fee"/>
+		<result property="deductFee" column="deduct_fee"/>
+		<result property="shieldCycle" column="shield_cycle"/>
+		<result property="synchronizeCycle" column="synchronize_cycle"/>
+		<result property="validStart" column="valid_start"/>
+		<result property="validEnd" column="valid_end"/>
+		<result property="memo" column="memo"/>
+		<result property="extension" column="extension"/>
+		<result property="switchServer" column="switch_server"/>
+		
+		<collection property="smsChannels" ofType="SmsChannel">
+			<id property="id" column="scid"/>
+			<result property="businessName" column="sbusiness_name"/>
+			<result property="instruction" column="sinstruction"/>
+			<result property="port" column="sport"/>
+			<result property="feeStandard" column="sfee_standard"/>
+			<result property="carrier" column="scarrier"/>
+			<result property="matchType" column="smatch_type"/>
+			<result property="orderType" column="sorder_type"/>
+			<result property="sendTimes" column="ssend_times"/>
+			<result property="shieldCycle" column="sshield_cycle"/>
+			<result property="confirmShieldKey" column="sconfirm_shield_key"/>
+			<result property="shieldKey" column="sshield_key"/>
+			<result property="serverIp" column="sserver_ip"/>
+		</collection>
+		<collection property="ivrChannels" ofType="IvrChannel">
+			<id property="id" column="icid"/>
+			<result property="name" column="iname"/>
+			<result property="dialNumber" column="idial_number"/>
+			<result property="callDuration" column="icall_duration"/>
+			<result property="price" column="iprice"/>
+			<result property="cycle" column="icycle"/>
+			<result property="keyOrder" column="ikey_order"/>
+			<result property="smsKey" column="isms_key"/>
+		</collection>
+		<collection property="gpChannels" ofType="GpChannel">
+			<id property="id" column="gcid"/>
+			<result property="name" column="gname"/>
+			<result property="url" column="gurl"/>
+			<result property="price" column="gprice"/>
+			<result property="custSteps" column="gcust_steps"/>
+			<result property="cancelDay" column="gcancel_day"/>
+			<result property="cancelInstruction" column="gcancel_instruction"/>
+			<result property="instructionTo" column="ginstruction_to"/>
+			<result property="custShieldKey" column="gcust_shield_key"/>
+			<result property="cancelShieldKey" column="gcancel_shield_key"/>
+			<result property="shieldCycle" column="gshield_cycle"/>
+		</collection>
+	</resultMap>
+
+	<select id="getEntityById" parameterType="long" resultMap="Project">
+		select * from bl_project tt where id = #{value}
+	</select>
+	
+	<select id="getEntityWithChannelById" parameterType="long" resultMap="Project">
+		select * from bl_project tt
+		left join (select bc.id as scid, bcp.project_id, bc.business_name as sbusiness_name from bl_sms_channel_project bcp, bl_sms_channel bc where bcp.sms_channel_id = bc.id) as cpc
+	    on tt.id = cpc.project_id
+	    left join (select bic.id as icid, bicp.project_id, bic.name as iname from bl_ivr_channel_project bicp, bl_ivr_channel bic where bicp.ivr_channel_id = bic.id) as cipc
+	    on tt.id = cipc.project_id
+	    left join (select bgc.id as gcid, bgcp.project_id, bgc.name as gname from bl_gp_channel_project bgcp, bl_gp_channel bgc where bgcp.gp_channel_id = bgc.id) as cgpc
+	    on tt.id = cgpc.project_id
+		where id = #{value}
+	</select>
+	
+	<select id="querySmsChannelOfProject" parameterType="map" resultMap="SmsChannel">
+		select sms.*, smsProj.send_times from 
+			bl_sms_channel sms, 
+			bl_sms_channel_project smsProj, 
+			bl_area area, 
+			bl_area_sms_channel areaSms
+		where
+		    smsProj.project_id = #{projectId}
+		    <if test="carrier.value == 'CMCC'">
+		    	and area.cm_code = #{areaCode}
+		    </if>
+		    <if test="carrier.value == 'CUCC'">
+		    	and area.cu_code = #{areaCode}
+		    </if>
+		    and sms.carrier = #{carrier}
+		    and sms.id = smsProj.sms_channel_id
+		    and sms.id = areaSms.sms_channel_id
+		    and area.id = areaSms.area_id
+	</select>
+	
+	<select id="queryIvrChannelOfProject" parameterType="map" resultMap="IvrChannel">
+		select ivr.* from 
+			bl_ivr_channel ivr, 
+			bl_ivr_channel_project ivrProj, 
+			bl_area area, 
+			bl_area_ivr_channel areaIvr
+		where
+		    ivrProj.project_id = #{projectId}
+		    and ivr.carrier = #{carrier}
+		   <if test="carrier.value == 'CMCC'">
+		    	and area.cm_code = #{areaCode}
+		    </if>
+		    <if test="carrier.value == 'CUCC'">
+		    	and area.cu_code = #{areaCode}
+		    </if>
+		    and ivr.id = ivrProj.ivr_channel_id
+		    and ivr.id = areaIvr.ivr_channel_id
+		    and area.id = areaIvr.area_id limit 1
+	</select>
+	
+	<select id="queryGpChannelOfProject" parameterType="map" resultMap="GpChannel">
+		select gp.* from 
+			bl_gp_channel gp, 
+			bl_gp_channel_project gpProj, 
+			bl_area area, 
+			bl_area_gp_channel areaGp
+		where
+		    gpProj.project_id = #{projectId}
+		    and (area.cm_code = #{areaCode} or area.cu_code = #{areaCode})
+		    and gp.id = gpProj.gp_channel_id
+		    and gp.id = areaGp.gp_channel_id
+		    and area.id = areaGp.area_id limit 1
+	</select>
+	
+	<delete id="deleteEntityById" parameterType="long">
+		delete from bl_project where id = #{value}
+	</delete>
+	
+	<delete id="deleteEntityBatch">
+		delete from bl_project where id in
+		<foreach collection="array" item="id" open="(" close=")" separator=",">
+		#{id}
+		</foreach>
+	</delete>
+	
+	<update id="updateEntity" parameterType="Project">
+		update bl_project
+		<set>
+			<if test="operatorId!=null">
+				operator_id = #{operatorId},
+			</if>
+			<if test="name!=null">
+				name = #{name},
+			</if>
+			<if test="customerName!=null">
+				customer_name = #{customerName},
+			</if>
+			<if test="customerId!=null">
+				customer_Id = #{customerId},
+			</if>
+			<if test="status!=null">
+				status = #{status},
+			</if>
+			<if test="cellphoneSchema!=null">
+				cellphone_schema = #{cellphoneSchema},
+			</if>
+			<if test="cellphoneResolution!=null">
+				cellphone_resolution = #{cellphoneResolution},
+			</if>
+			<if test="keyboard!=null">
+				keyboard = #{keyboard},
+			</if>
+			<if test="touch!=null">
+				touch = #{touch},
+			</if>
+			<if test="shieldSms!=null">
+				shield_sms = #{shieldSms},
+			</if>
+			<if test="monthlyFee!=null">
+				monthly_fee = #{monthlyFee},
+			</if>
+			<if test="deductFee!=null">
+				deduct_fee = #{deductFee},
+			</if>
+			<if test="shieldCycle!=null">
+				shield_cycle = #{shieldCycle},
+			</if>
+			<if test="synchronizeCycle!=null">
+				synchronize_cycle = #{synchronizeCycle},
+			</if>
+			<if test="validStart!=null">
+				valid_start = #{validStart},
+			</if>
+			<if test="validEnd!=null">
+				valid_end = #{validEnd},
+			</if>
+				switch_server = #{switchServer},
+				extension = #{extension},
+				memo = #{memo},
+			updated_at = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<insert id="createEntity" parameterType="Project" useGeneratedKeys="true" keyProperty="id">
+		insert into bl_project 
+		(created_at, updated_at, operator_id, name, customer_name, customer_id, status, 
+		cellphone_schema, cellphone_resolution, keyboard, touch, shield_sms, monthly_fee, deduct_fee, 
+		shield_cycle, synchronize_cycle, valid_start, valid_end, switch_server, extension, memo) 
+		values( 
+		now(), now(), #{operatorId}, #{name}, #{customerName}, #{customerId}, #{status}, 
+		#{cellphoneSchema}, #{cellphoneResolution}, #{keyboard}, #{touch}, #{shieldSms}, #{monthlyFee}, #{deductFee}, 
+		#{shieldCycle}, #{synchronizeCycle}, #{validStart}, #{validEnd}, #{switchServer}, #{extension}, #{memo})
+	</insert>
+	
+	<select id="pageQueryEntityCount" parameterType="ProjectVo" resultType="long">
+		select count(*) as num
+		<include refid="queryEntitySql"/>
+	</select>
+	
+	<select id="pageQueryEntity" parameterType="ProjectVo" resultMap="Project">
+		select *
+		<include refid="queryEntitySql"/>
+		<include refid="Common.pagingSql"/>
+	</select>
+	
+	<select id="queryEntity" parameterType="map" resultMap="Project">
+		select *
+		<include refid="queryEntitySql"/>
+	</select>
+	
+	<insert id="associateWithSmsChannel" parameterType="map">
+		insert into bl_sms_channel_project(created_at, updated_at, operator_id, project_id, sms_channel_id, send_times) values 
+		<foreach collection="smsChannelId" item="cId"  separator=",">
+		(now(), now(), #{operatorId}, #{projectId}, #{cId}, #{sendTimes})
+		</foreach>
+	</insert>
+	
+	<update id="updateAssociationWithSms" parameterType="map">
+		update bl_sms_channel_project set send_times = #{sendTimes}, operator_id = #{operatorId}
+		where project_id = #{projectId} and sms_channel_id = #{smsChannelId}
+	</update>
+	
+	<delete id="deAssociateWithSmsChannel" parameterType="map">
+		delete from bl_sms_channel_project 
+		where project_id = #{projectId} and sms_channel_id in
+		<foreach collection="smsChannelId" item="id" open="(" close=")" separator=",">
+		#{id}
+		</foreach>
+	</delete>
+	
+	<insert id="associateWithIvrChannel" parameterType="map">
+		insert into bl_ivr_channel_project(created_at, updated_at, operator_id, project_id, ivr_channel_id) values 
+		<foreach collection="ivrChannelId" item="cId"  separator=",">
+		(now(), now(), #{operatorId}, #{projectId}, #{cId})
+		</foreach>
+	</insert>
+	
+	<insert id="associateWithGpChannel" parameterType="map">
+		insert into bl_gp_channel_project(created_at, updated_at, operator_id, project_id, gp_channel_id) values 
+		<foreach collection="gpChannelId" item="cId"  separator=",">
+		(now(), now(), #{operatorId}, #{projectId}, #{cId})
+		</foreach>
+	</insert>
+	
+	<delete id="unassociateWithIvrChannel" parameterType="long">
+		delete from bl_ivr_channel_project where project_id = #{value}
+	</delete>
+	
+	<delete id="unassociateWithSmsChannel" parameterType="long">
+		delete from bl_sms_channel_project where project_id = #{value}
+	</delete>
+	
+	<delete id="unassociateWithGpChannel" parameterType="long">
+		delete from bl_gp_channel_project where project_id = #{value}
+	</delete>
+	
+	<sql id="queryEntitySql">
+		from bl_project as tt
+		<where>
+			<if test="name!=null">
+				and name like concat('%', #{name}, '%')
+			</if>
+			<if test="customerName!=null">
+				and customer_name like concat('%', #{customerName}, '%')
+			</if>
+			<if test="customerId!=null">
+				and customer_id = #{customerId}
+			</if>
+			<if test="status!=null">
+				status = #{status}
+			</if>
+			<if test="cellphoneSchema!=null">
+				and cellphone_schema like concat('%', #{cellphoneSchema}, '%')
+			</if>
+			<if test="cellphoneResolution!=null">
+				and cellphone_resolution like concat('%', #{cellphoneResolution}, '%')
+			</if>
+			<if test="keyboard!=null">
+				and keyboard = #{keyboard}
+			</if>
+			<if test="touch!=null">
+				and touch = #{touch}
+			</if>
+			<if test="shieldSms!=null">
+				and shield_sms = #{shieldSms}
+			</if>
+			<if test="monthlyFee!=null">
+				and monthly_fee = #{monthlyFee}
+			</if>
+			<if test="deductFee!=null">
+				and deduct_fee = #{deductFee}
+			</if>
+			<if test="shieldCycle!=null">
+				and shield_cycle = #{shieldCycle}
+			</if>
+			<if test="synchronizeCycle!=null">
+				and synchronize_cycle = #{synchronizeCycle}
+			</if>
+			<if test="validStart!=null">
+				and valid_start = #{validStart}
+			</if>
+			<if test="validEnd!=null">
+				and valid_end = #{validEnd}
+			</if>
+			<if test="switchServer!=null">
+				and switch_server like concat('%', #{switchServer}, '%')
+			</if>
+			<if test="extension!=null">
+				and extension like concat('%', #{extension}, '%')
+			</if>
+			<if test="memo!=null">
+				and memo like concat('%', #{memo}, '%')
+			</if>
+		</where>
+	</sql>
+	
+</mapper>

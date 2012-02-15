@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rainy.billing.dao.impl.RightDaoImpl" >
+
+    <resultMap type="Right" id="Right">
+		<id property="id" column="id"/>
+		<result property="createdAt" column="created_at"/>
+		<result property="updatedAt" column="updated_at"/>
+		<result property="operatorId" column="operator_id"/>
+		<result property="name" column="name"/>
+		<result property="memo" column="memo"/>
+	</resultMap>
+
+	<select id="getEntityById" parameterType="long" resultMap="Right">
+		select *
+		from bl_right where id = #{value}
+	</select>
+	
+	<delete id="deleteEntityById" parameterType="long">
+		delete from bl_right where id = #{value}
+	</delete>
+	
+	<delete id="deleteEntityBatch" parameterType="long">
+		delete from bl_right where id in 
+		<foreach collection="array" item="id" open="(" close=")" separator=",">
+		#{id}
+		</foreach>
+	</delete>
+	
+	<update id="updateEntity" parameterType="Right">
+		update bl_right
+		<set>
+			<if test="name!=null">
+				name = #{name},
+			</if>
+				memo = #{memo},
+			<if test="operatorId!=null">
+				operator_id = #{operatorId},
+			</if>
+			updated_at = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<insert id="createEntity" parameterType="Right" useGeneratedKeys="true" keyProperty="id">
+		insert into bl_right
+		(created_at, updated_at, name, memo, operator_id) 
+		values 
+		(now(), now(), #{name}, #{memo}, #{operatorId})
+	</insert>
+	
+	<select id="pageQueryEntityCount" parameterType="RightVo" resultType="long">
+		select count(*) as num
+		<include refid="pageQueryEntitySql"/>
+	</select>
+	
+	<select id="pageQueryEntity" parameterType="RightVo" resultMap="Right">
+		select *
+		<include refid="pageQueryEntitySql"/>
+		<include refid="Common.pagingSql"/>
+	</select>
+	
+	<select id="queryEntityByRoleId" parameterType="long" resultMap="Right">
+		select * from bl_right as tt 
+		where exists 
+		(select 1 from bl_right_role rr where rr.role_id = #{value} and rr.right_id = tt.id)
+	</select>
+	
+	<select id="allEntity" resultMap="Right">
+		select * from bl_right
+	</select>
+	
+	<select id="queryEntityByUserId" parameterType="long" resultMap="Right">
+		select  distinct rig.*  
+		from bl_right rig, bl_right_role rr  
+		where rig.id = rr.right_id and exists ( 
+			select r.id  from bl_role r, bl_user_role ur 
+			where 
+			ur.user_id = #{value} and 
+			ur.role_id = r.id and 
+			rr.role_id = r.id
+		 )
+		order by rig.id 
+	</select>
+	<insert id="addResourceToRight" parameterType="map">
+		insert into bl_resource_right(right_id, resource_id, operator_id, created_at, updated_at) values 
+		<foreach collection="resourceId" item="rId"  separator=",">
+		(#{rightId}, #{rId}, #{operatorid}, now(), now())
+		</foreach>	
+	</insert>
+	
+	<delete id="removeResourceOfRight" parameterType="long">
+		delete from bl_resource_right where right_id = #{value} 
+	</delete>
+	
+	<sql id="pageQueryEntitySql">
+		from bl_right as tt
+		<where>
+			<if test="name!=null">
+				and name like concat('%', #{name}, '%')
+			</if>
+			<if test="memo!=null">
+				and memo like concat('%', #{memo}, '%')
+			</if>
+		</where>
+	</sql>
+	
+	<delete id="deleteRightRoleRelation" parameterType="map">
+		delete from bl_right_role 
+		<where>
+			<if test="rightId != null">
+				or right_id in
+				<foreach item="rigid" collection="rightId" open="(" close=")" separator=",">
+				#{rigid}
+				</foreach>
+			</if>
+			<if test="roleId != null">
+				or role_id in 
+				<foreach item="roleid" collection="roleId" open="(" close=")" separator=",">
+				#{roleid}
+				</foreach>
+			</if>
+		</where> 
+	</delete>
+	
+</mapper>

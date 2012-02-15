@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rainy.billing.dao.impl.QuestionDaoImpl" >
+
+    <resultMap type="Question" id="Question">
+		<id property="id" column="id"/>
+		<result property="createdAt" column="created_at"/>
+		<result property="updatedAt" column="updated_at"/>
+		<result property="operatorId" column="operator_id"/>
+		
+		<result property="content" column="content"/>
+		<result property="answer" column="answer"/>
+		<result property="memo" column="memo"/>
+	</resultMap>
+
+	<select id="getEntityById" parameterType="long" resultMap="Question">
+		select * from bl_question where id = #{value}
+	</select>
+	
+	<delete id="deleteEntityById" parameterType="long">
+		delete from bl_question where id = #{value}
+	</delete>
+	
+	<delete id="deleteEntityBatch">
+		delete from bl_question where id in
+		<foreach collection="array" item="id" open="(" close=")" separator=",">
+		#{id}
+		</foreach>
+	</delete>
+	
+	<update id="updateEntity" parameterType="Question">
+		update bl_question
+		<set>
+			<if test="operatorId!=null">
+				operator_id = #{operatorId},
+			</if>
+			<if test="content!=null">
+				content = #{content},
+			</if>
+				answer = #{answer},
+			updated_at = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<insert id="createEntity" parameterType="Question" useGeneratedKeys="true" keyProperty="id">
+		insert into bl_question 
+		(created_at, updated_at, operator_id, content, answer) 
+		values 
+		(now(), now(), #{operatorId}, #{content}, #{answer})
+	</insert>
+	
+	<select id="pageQueryEntityCount" parameterType="QuestionVo" resultType="long">
+		select count(*) as num
+		<include refid="queryEntitySql"/>
+	</select>
+	
+	<select id="pageQueryEntity" parameterType="QuestionVo" resultMap="Question">
+		select *
+		<include refid="queryEntitySql"/>
+		<include refid="Common.pagingSql"/>
+	</select>
+	
+	<select id="queryEntity" parameterType="map" resultMap="Question">
+		select *
+		<include refid="queryEntitySql"/>
+	</select>
+	
+	<sql id="queryEntitySql">
+		from bl_question as tt
+		<where>
+			<if test="content!=null">
+				and content like concat('%', #{content}, '%')
+			</if>
+			<if test="answer!=null">
+				and answer like concat('%', #{answer}, '%')
+			</if>
+		</where>
+	</sql>
+	
+</mapper>

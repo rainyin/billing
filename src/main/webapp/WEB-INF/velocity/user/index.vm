@@ -1,0 +1,122 @@
+<div class="tabContent">
+	<table id="bl_user_navgrid">
+		<tr><td/></tr>
+	</table> 
+	<div id="bl_user_pagernav"></div> 
+</div>
+<script type="text/javascript">
+registerNamespace("bl_user");
+bl_user.query_url = APP_PATH + "/user/list.do";
+bl_user.oper_url = APP_PATH + "/user/operate.do";
+bl_user.resetPassword_url = APP_PATH + "/user/resetPassword.do";
+bl_user.allRole_url = APP_PATH + "/user/allRole.do";
+bl_user.checkUsernameUrl2 = APP_PATH + '/user/checkUsername.do';
+bl_user.availableRole_url = APP_PATH + "/user/availableRole.do";
+bl_user.associateRole_url = APP_PATH + "/user/associateRole.do";
+	
+bl_user.checkUsername2 = function(response, postData) {
+	var json = eval('(' + response.responseText + ')');
+	var data = [true, '', 0];
+	if(json.exist) data = [false, '登录名已经存在，请重新输入!', 0];
+	return data;
+};
+
+bl_user.initMultiselectDialog = function(){
+	bl_user.multiselectDialog = new MultiselectDialog({
+		   gridId: 'bl_user_navgrid',
+		   container: 'bl_user_multiselect_role',
+		   paramHiddenName: 'userId',
+		   paramSelectName: 'roleId',
+		   attrSelectSize: 11,
+		   width: 600,
+		   height: 300,
+		   remindTitle: '请选择用户!',
+		   popupTitle: '关联角色',
+		   getItemUrl: bl_user.availableRole_url,
+		   submitUrl:bl_user.associateRole_url
+	});
+}
+
+$().ready(function(){
+	bl_user.initMultiselectDialog();
+	bl_user.mygrid = $("#bl_user_navgrid").jqGrid( {
+		url : bl_user.query_url,
+		datatype : 'xml',
+		mtype : 'GET',
+		colNames : [ ' ', '用户名', '登录名', '角色', '状态', '地址', '电话', '邮箱', '备注', '创建日期' ],
+		colModel : [ 
+			{name : 'id', index : 'id', hidden : true, width : 100, editable : true, editoptions : {defaultValue : ''} },
+			{name : 'name', index : 'name', width : 100, editable : true, editoptions : {size : 20}, editrules : {required : true} },
+			{name : 'username', index : 'username', width : 100, editable : true, editoptions : {size : 20}, editrules : {required : true} },
+			{name : 'roleId', index : 'roleId', width : 100, editable : true, search : false, edittype: 'select', editoptions : { defaultValue : '', dataUrl: bl_user.allRole_url},editrules : {required : true}},
+			{name : 'status', index : 'status', width : 100, editable : true, edittype: 'select', editoptions : {value: 'ENABLED:激活;DISABLED:未激活'},stype: 'select', searchoptions: {value: ':请选择;ENABLED:激活;DISABLED:未激活' } },
+			{name : 'tel', index : 'tel', width : 100, editable : true, editoptions : {size : 20}, editrules: {edithidden: true} },
+			{name : 'address', index : 'address', width : 100, align : 'right', editable : true, editoptions : {size : 20}, editrules: {edithidden: true} },
+			{name : 'email',index : 'email',width : 100,align : 'right',editable : true,editoptions : {size : 20} },
+			{name : 'memo',index : 'memo',width : 200,sortable : false,editable : true,edittype : 'textarea',editoptions : {rows : "2",cols : "25"} },
+			{name : 'createdAt',index : 'createdAt',width : 150,search : false,editable : false,formatter : 'datetime'}
+		 ],
+		pager : '#bl_user_pagernav',
+		rowNum : 10,
+		rowList : [ 10, 20, 30 ],
+		sortname : 'id',
+		rownumbers : true,
+		sortorder : 'desc',
+		multiselect : false,
+		viewrecords : true,
+		gridview : true,
+		caption : '客户管理',
+		editurl : bl_user.oper_url,
+		height : 300
+	});
+	$("#bl_user_navgrid").jqGrid('navGrid', '#bl_user_pagernav', 
+			{
+				search : false
+			}, 
+			{
+				reloadAfterSubmit : false,
+				recreateForm: true,
+				afterSubmit: bl_user.checkUsername2
+			}, 
+			{
+				reloadAfterSubmit : true,
+				recreateForm: true,
+				afterSubmit: bl_user.checkUsername2
+			}, 
+			{
+				reloadAfterSubmit : true
+			}, 
+			{
+				multipleSearch : false
+			} 
+			);
+	bl_user.mygrid.filterToolbar( {} );
+	$("#bl_user_navgrid").jqGrid('navButtonAdd', '#bl_user_pagernav', {
+		caption : "开关",
+		title : "开或关搜索栏",
+		onClickButton : function() {
+			$("#bl_user_navgrid")[0].toggleToolbar();
+		}
+	});
+	$("#bl_user_navgrid").jqGrid('navButtonAdd', '#bl_user_pagernav', {
+		caption : "清空",
+		title : "清空搜索栏",
+		onClickButton : function() {
+			$("#bl_user_navgrid")[0].clearToolbar();
+		}
+	});
+	$("#bl_user_navgrid").jqGrid('navButtonAdd', '#bl_user_pagernav', {
+		caption : "重置密码",
+		title : "重置密码",
+		onClickButton : function() {
+			var itemId = bl_user.mygrid.getGridParam('selrow');
+			if(itemId){
+				$.get(bl_user.resetPassword_url, {userId:itemId});
+			}
+		}
+	});
+	bl_user.mygrid.hideCol(['tel', 'address']);
+});
+</script>
+
+<div id="bl_user_multiselect_role"></div>

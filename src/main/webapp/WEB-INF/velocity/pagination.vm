@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rows>
+	<page>${vo.page}</page>
+	<total>${vo.total}</total>
+	<records>${vo.records}</records>
+	#foreach($row in ${vo.rows})
+	<row id="$row.id">
+		#foreach($cell in ${row.cell})
+		<cell>$!cell</cell>
+		#end
+	</row>
+	#end
+</rows>

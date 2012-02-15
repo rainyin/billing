@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rainy.billing.dao.impl.RoleDaoImpl" >
+
+    <resultMap type="Role" id="Role">
+		<id property="id" column="id"/>
+		<result property="createdAt" column="created_at"/>
+		<result property="updatedAt" column="updated_at"/>
+		<result property="operatorId" column="operator_id"/>
+		<result property="name" column="name"/>
+		<result property="memo" column="memo"/>
+	</resultMap>
+
+	<select id="getEntityById" parameterType="long" resultMap="Role">
+		select *
+		from bl_role where id = #{value}
+	</select>
+	
+	<delete id="deleteEntityById" parameterType="long">
+		delete from bl_role where id = #{value}
+	</delete>
+	
+	<delete id="deleteEntityBatch" >
+		delete from bl_role where id in
+		<foreach collection="array" item="id" open="(" close=")" separator=",">
+		#{id}
+		</foreach>
+	</delete>
+	
+	<update id="updateEntity" parameterType="Role">
+		update bl_role
+		<set>
+			<if test="name!=null">
+				name = #{name},
+			</if>
+				memo = #{memo},
+			<if test="operatorId!=null">
+				operator_id = #{operatorId},
+			</if>
+			updated_at = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<insert id="createEntity" parameterType="Role" useGeneratedKeys="true" keyProperty="id">
+		insert into bl_role
+		(created_at, updated_at, name, memo, operator_id) 
+		values 
+		(now(), now(), #{name}, #{memo}, #{operatorId})
+	</insert>
+	
+	<select id="pageQueryEntityCount" parameterType="RoleVo" resultType="long">
+		select count(*) as num
+		<include refid="pageQueryEntitySql"/>
+	</select>
+	
+	<select id="pageQueryEntity" parameterType="RoleVo" resultMap="Role">
+		select *
+		<include refid="pageQueryEntitySql"/>
+		<include refid="Common.pagingSql"/>
+	</select>
+	
+	<sql id="pageQueryEntitySql">
+		from bl_role as tt
+		<where>
+			<if test="name!=null">
+				and name like concat('%', #{name}, '%')
+			</if>
+			<if test="memo!=null">
+				and memo like concat('%', #{memo}, '%')
+			</if>
+		</where>
+	</sql>
+	
+	<select id="allEntity" resultMap="Role">
+		select * from bl_role
+	</select>
+	
+	<insert id="addRightToRole" parameterType="map">
+		insert into bl_right_role(role_id, right_id, operator_id, created_at, updated_at) values 
+		<foreach collection="rightId" item="rId" separator=",">
+		(#{roleId}, #{rId}, #{operatorid}, now(), now())
+		</foreach>	
+	</insert>
+	
+	<delete id="removeRightOfRole" parameterType="long">
+		delete from bl_right_role where  role_id = #{value}
+	</delete>
+	
+	<select id="queryEntityByUserId" parameterType="long" resultMap="Role">
+		select * from bl_role br, bl_user_role bur 
+		where 
+		br.id = bur.role_id and 
+		bur.user_id = #{value}
+	</select>
+	
+	<insert id="addRoleToUser" parameterType="map">
+		insert into bl_user_role(user_id, role_id, operator_id, created_at, updated_at) values 
+		<foreach collection="roleId" item="rId"  separator=",">
+		(#{userid}, #{rId}, #{operatorid}, now(), now())
+		</foreach>	
+	</insert>
+	
+	<delete id="removeRoleOfUser" parameterType="long">
+		delete from bl_user_role where user_id = #{value} 
+	</delete>
+	
+</mapper>

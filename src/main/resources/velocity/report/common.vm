@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graph caption='${data.caption}' xAxisName='${data.xAxis}' animation='0' yAxisName='' decimalPrecision='0' baseFontSize='13' formatNumberScale='0'>
+	#foreach($item in $data.details)
+		<set name='$item.name' value='$item.count' color='$item.color'/>
+	#end
+</graph>

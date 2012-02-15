@@ -1,0 +1,108 @@
+<html>
+	<head>
+		<title>用户登录</title>
+		<script type="text/javascript" src="#rootUrl('/static/jslib/jquery/jquery-1.6.2.js')"></script>
+		<script type="text/javascript" src="#rootUrl('/static/js/base64.js')"></script>
+		<link rel="stylesheet" type="text/css" media="screen" href="#rootUrl('/static/css/login.css')" />
+		<script type="text/javascript">
+		var usernameInCookie = "$!{username}";
+		var error_ind = "$!{error}";
+		var passwdInCookie = "$!{password}";
+		var rememberMe = $!{rememberMe};
+		var checkVerifyCodeUrl = "#rootUrl('/security/checkVerifyCode.do')";
+		var verifyCodeUrl = "#rootUrl('/security/verifyCode.do')";
+
+		$().ready(function(){
+			$("#iusername").focus();
+			$("#iusername").val(usernameInCookie);
+			$("#ipassword").val(passwdInCookie);
+			$("#rememberMe").attr("checked", rememberMe);
+			if(error_ind == '1'){
+				$("#errorMsg").show();
+			}
+		});
+		
+		function getParams(){
+			return "securityCode=" + $("#j_security_code").val();
+		}
+		
+		function encode() {
+			$.ajax({type: "POST",url: checkVerifyCodeUrl, data: getParams(), dataType: "json", success: function(data){
+				if(data.success){
+					$("#j_username").val(Base64.encode($("#iusername").val()));
+					$("#j_password").val(Base64.encode($("#ipassword").val()));
+					$("#j_security_code").val($("#j_security_code").val());
+					$("#loginForm").submit();
+				} else {
+					var errorMsg = $("#errorMsg");
+					errorMsg.html(data.msg);
+					reloadcode();
+					errorMsg.show();
+				}
+			}});
+		}
+		
+		document.onkeydown = function(event) {
+			var e = event ? event :(window.event ? window.event : null); 
+			if(e.keyCode==13){
+				encode();
+			} 
+		};
+
+		function reloadcode(){
+			$("#verifycode").attr('src', verifyCodeUrl + "?ran=" +Math.random());
+		}
+		</script>
+	</head>
+	<body>
+		<div id="header">
+			<h1>手机计费系统</h1>
+		</div>
+		<div class="error_msg" id="errorMsg">用户名或密码错误</div>
+		<div id="login-form">
+			<form action="#rootUrl('/j_spring_security_check')" method="post" id="loginForm">
+				<table>
+					<tbody>
+						<tr>
+							<td align="right"><label for="iusername">登录名:</label></td>
+							<td align="left">
+								<input type="hidden" name="j_username" value="" id="j_username">
+								<input type="text" name="iusername"tabindex="1" id="iusername">
+							</td>
+						</tr>
+						<tr>
+							<td align="right"><label for="ipassword">密码:</label></td>
+							<td align="left">
+								<input type="hidden" name="j_password" value="" id="j_password">
+								<input type="password" name="ipassword" tabindex="2" id="ipassword"/>
+							</td>
+						</tr>
+						<tr>
+							<td align="right"><label for="ipassword">验证码:</label></td>
+							<td align="left">
+								<input type="text" name="j_security_code" value="" id="j_security_code" tabindex="3">
+								<img id ="verifycode" src="#rootUrl('/security/verifyCode.do')" alt="验证码" onclick="reloadcode()" title="点击重新获取"/>
+							</td>
+						</tr>
+						<tr>
+							<td></td>
+							<td align="left">
+								<label for="rememberMe">
+									<input type="checkbox" tabindex="4" name="_spring_security_remember_me" id="rememberMe">保持登录状态
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<td align="left">
+									<a href="#"></a>
+							</td>
+							<td align="right">
+								<input name="login" value="登录>> " tabindex="5" type="button" onclick="encode()">
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</form>
+		</div>
+	</body>
+</html>

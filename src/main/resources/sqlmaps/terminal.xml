@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rainy.billing.dao.impl.TerminalDaoImpl" >
+
+    <resultMap type="Terminal" id="Terminal">
+		<id property="id" column="id"/>
+		<result property="createdAt" column="created_at"/>
+		<result property="updatedAt" column="updated_at"/>
+		<result property="operatorId" column="operator_id"/>
+		
+		<result property="uid" column="uid"/>
+		<result property="imsi" column="imsi"/>
+		<result property="number" column="number"/>
+		<result property="projectId" column="project_id"/>
+		<result property="projectName" column="project_name"/>
+		<result property="carrier" column="carrier"/>
+		<result property="areaCode" column="area_code"/>
+		<result property="catNumber" column="cat_number"/>
+		<result property="version" column="version"/>
+	</resultMap>
+
+	<select id="getEntityById" parameterType="long" resultMap="Terminal">
+		select *
+		from bl_terminal where id = #{value}
+	</select>
+	
+	<select id="getEntityByUid" parameterType="string" resultMap="Terminal">
+		select * from bl_terminal where uid = #{value}
+	</select>
+	
+	<select id="getEntityByImsi" parameterType="String" resultMap="Terminal">
+		select * from bl_terminal where imsi = #{imsi}
+	</select>
+	
+	<delete id="deleteEntityById" parameterType="long">
+		delete from bl_terminal where id = #{value}
+	</delete>
+	
+	<delete id="deleteEntityBatch" >
+		delete from bl_terminal where id in
+		<foreach collection="array" item="id" open="(" close=")" separator=",">
+		#{id}
+		</foreach>
+	</delete>
+	
+	<update id="updateEntity" parameterType="Terminal">
+		update bl_terminal
+		<set>
+			<if test="uid!=null">
+				uid = #{uid},
+			</if>
+			<if test="imsi!=null">
+				imsi = #{imsi},
+			</if>
+			<if test="number!=null">
+				number = #{number},
+			</if>
+			<if test="projectId!=null">
+				project_id = #{projectId},
+			</if>
+			<if test="projectName!=null">
+				project_name = #{projectName},
+			</if>
+			<if test="areaCode!=null">
+				area_code = #{areaCode},
+			</if>
+			<if test="carrier!=null">
+				carrier = #{carrier},
+			</if>
+			<if test="catNumber!=null">
+				cat_number = #{catNumber},
+			</if>
+			<if test="version!=null">
+				version = #{version},
+			</if>
+			<if test="operatorId!=null">
+				operator_id = #{operatorId},
+			</if>
+			updated_at = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<update id="updateEntityUpdatedAt" parameterType="long">
+		update bl_terminal set updated_at = now() where id = #{id}
+	</update>
+	
+	<insert id="createEntity" parameterType="Terminal" useGeneratedKeys="true" keyProperty="id">
+		insert into bl_terminal
+		(created_at, updated_at, uid, imsi, project_id, project_name, carrier, area_code, cat_number, version, operator_id) 
+		values 
+		(now(), now(), #{uid}, #{imsi}, #{projectId}, #{projectName}, #{carrier}, #{areaCode}, #{catNumber}, #{version}, #{operatorId})
+	</insert>
+	
+	<select id="pageQueryEntityCount" parameterType="TerminalVo" resultType="long">
+		select count(*) as num
+		<include refid="queryEntitySql"/>
+	</select>
+	
+	<select id="pageQueryEntity" parameterType="TerminalVo" resultMap="Terminal">
+		select *
+		<include refid="queryEntitySql"/>
+		<include refid="Common.pagingSql"/>
+	</select>
+	
+	<select id="queryEntity" parameterType="map" resultMap="Terminal">
+		select *
+		<include refid="queryEntitySql"/>
+	</select>
+	
+	<sql id="queryEntitySql">
+		from bl_terminal as tt
+		<where>
+			<if test="projectId!=null">
+				and project_id = #{projectId}
+			</if>
+			<if test="uid!=null">
+				and uid = #{uid}
+			</if>
+			<if test="imsi!=null">
+				and imsi like concat('%', #{imsi}, '%')
+			</if>
+			<if test="number!=null">
+				and number like concat('%', #{number}, '%')
+			</if>
+			<if test="projectName!=null">
+				and project_name like concat('%', #{projectName}, '%')
+			</if>
+			<if test="carrier!=null">
+				and carrier = #{carrier}
+			</if>
+			<if test="areaCode!=null">
+				and area_code = #{areaCode}
+			</if>
+			<if test="catNumber!=null">
+				and cat_number like concat('%', #{catNumber}, '%')
+			</if>
+			<if test="version!=null">
+				and version = #{version}
+			</if>
+			<if test="createdAt!=null">
+				and date(created_at) <![CDATA[=]]> #{createdAt}
+			</if>
+			<if test="updatedAt!=null">
+				and date(updated_at) <![CDATA[=]]> #{updatedAt}
+			</if>
+		</where>
+	</sql>
+	
+	
+</mapper>

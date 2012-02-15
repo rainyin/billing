@@ -1,0 +1,28 @@
+﻿通道请求字符串
+http://222.223.231.19:9000/server/getprovider.aspx?projectid=1000&imsi=123456&plmn=46000&sc=0311&imei=123123
+
+getprovider:count=0&hidesms=0&maxfee=0&isfee==0&name0=0&command0=0&spid0=0&fee0=0&smstype0=0&sendsmscount0=0&sendcycle0=0
+
+
+46000 cmcc
+46002 cucc
+
+
+
+手机获取系统分配编号
+http://222.223.231.19:9000/server/getimsiserialno.aspx
+
+获取短信猫号码列表
+http://222.223.231.19:9000/server/getsmsnum.aspx
+
+获取职能答题结果
+http://localhost:1962/server/getasksms.aspx?sms=短信内容(需要进行GBK编码)
+
+
+URL:http://xxxxxxxx. getprovider.aspx?imsi=xxxxxxx&imei=234234&projectid=项目编号(服务器分配)&plmn=运营商类型&sc=区号&uid=99999&ver=003
+
+
+SET:maxfee=20&blacktime=15&circle=7*24*60&wh1=9&wh2=22&smskey= xxx^yyy|xxx^|订阅成功@|回复任意~啊|&hide=1&UID=201111220000001&CAT=13488886666
+SMS:count=2&cmd0=C&spid0=1876356&fee0=1&repeat0=1&cmd1=C&spid1=1876356&fee1=1& repeat1=1&jid=2
+GJ: url=xxxx&step=下载->确认&canceldate=20&jid=3
+IVR:phone=2323232&time=12&dtmf=1->2->3&jid=4

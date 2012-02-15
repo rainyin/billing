@@ -1,0 +1,134 @@
+<div class="tabContent">
+	<table id="bl_right_navgrid">
+		<tr><td/></tr>
+	</table> 
+	<div id="bl_right_pagernav"></div> 
+</div>
+<script type="text/javascript">
+registerNamespace("bl_right");
+bl_right.query_url = APP_PATH + "/security/right/list.do";
+bl_right.oper_url = APP_PATH + "/security/right/operate.do";
+bl_right.allResource_url = APP_PATH + "/security/right/allResource.do";
+bl_right.associateResource_url = APP_PATH + "/security/right/associateResource.do";
+
+bl_right.initMultiselectDialog = function(){
+	bl_right.multiselectDialog = new MultiselectDialog({
+		   gridId: 'bl_right_navgrid',
+		   container: 'bl_right_multiselect_resource',
+		   paramHiddenName: 'rightId',
+		   paramSelectName: 'resourceId',
+		   attrSelectSize: 20,
+		   width: 700,
+		   height: 450,
+		   remindTitle: '请选择权限!',
+		   popupTitle: '关联资源',
+		   getItemUrl: bl_right.allResource_url,
+		   submitUrl: bl_right.associateResource_url
+	});
+}
+
+registerNamespace("bl_right");
+$().ready(function(){
+	bl_right.initMultiselectDialog();
+	bl_right.mygrid = $("#bl_right_navgrid").jqGrid( {
+		url : bl_right.query_url,
+		datatype : 'xml',
+		mtype : 'GET',
+		colNames : [ ' ', '名称', '备注', '创建日期' ],
+		colModel : [ {
+			name : 'id',
+			index : 'id',
+			hidden : true,
+			width : 100,
+			editable : true,
+			editoptions : {
+				defaultValue : ''
+			}
+		}, {
+			name : 'name',
+			index : 'name',
+			width : 200,
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true
+			}
+		}, {
+			name : 'memo',
+			index : 'memo',
+			width : 350,
+			sortable : false,
+			editable : true,
+			edittype : 'textarea',
+			editoptions : {
+				rows : "2",
+				cols : "25"
+			}
+		}, {
+			name : 'createdAt',
+			index : 'createdAt',
+			width : 200,
+			search : false,
+			editable : false,
+			formatter : 'datetime'
+		} ],
+		pager : '#bl_right_pagernav',
+		rowNum : 10,
+		rowList : [ 10, 20, 30 ],
+		sortname : 'id',
+		rownumbers : true,
+		sortorder : 'desc',
+		multiselect : false,
+		viewrecords : true,
+		gridview : true,
+		caption : '客户管理',
+		editurl : bl_right.oper_url,
+		height : 300
+	});
+	$("#bl_right_navgrid").jqGrid('navGrid', '#bl_right_pagernav', 
+			{
+				search : false
+			}, 
+			{
+				reloadAfterSubmit : false,
+				recreateForm: true
+			}, 
+			{
+				reloadAfterSubmit : true,
+				recreateForm: true
+			}, 
+			{
+				reloadAfterSubmit : true
+			}, 
+			{
+				multipleSearch : false
+			} 
+			);
+	bl_right.mygrid.filterToolbar( {} );
+	$("#bl_right_navgrid").jqGrid('navButtonAdd', '#bl_right_pagernav', {
+		caption : "开关",
+		title : "开或关搜索栏",
+		onClickButton : function() {
+			$("#bl_right_navgrid")[0].toggleToolbar();
+		}
+	});
+	$("#bl_right_navgrid").jqGrid('navButtonAdd', '#bl_right_pagernav', {
+		caption : "清空",
+		title : "清空搜索栏",
+		onClickButton : function() {
+			$("#bl_right_navgrid")[0].clearToolbar();
+		}
+	});
+	$("#bl_right_navgrid").jqGrid('navButtonAdd', '#bl_right_pagernav', {
+		caption : "关联资源",
+		title : "关联资源",
+		onClickButton : function() {
+			bl_right.multiselectDialog.onClickFunc();
+		}
+	});
+});
+</script>
+
+<div id="bl_right_multiselect_resource"></div>

@@ -1,0 +1,195 @@
+<div class="tabContent">
+	<form style="margin-top:10px;border:1px solid #eeeaaa;width:600px;" id="bl_user_editForm">
+		<div id="user_message" style="padding-left:10px;"></div>
+		<div class="userInfo">
+			<div class="formItem">
+				<div class="label">
+					<label for="user_name">用户名<font class="required">*</font></label>
+				</div>
+				<div class="item">
+					<input type="text" name="name" id="user_name" value="$!{user.name}"/>
+					<input type="hidden" name="id" id="user_id" value="$!{user.id}"/>
+				</div>
+			</div>
+			<div class="formItem">
+				<div class="label">
+					<label for="user_username">登录名<font class="required">*</font></label>
+				</div>
+				<div class="item">
+					<input type="text" name="username" readonly id="user_username" value="$!{user.username}"/>
+				</div>
+			</div>
+			<div class="formItem">
+				<div class="label">
+					<label for="user_address">地址</label>
+				</div>
+				<div class="item">
+					<input type="text" name="address" id="user_address" value="$!{user.address}"/>
+				</div>
+			</div>
+			<div class="formItem">
+				<div class="label">
+					<label for="user_tel">电话</label>
+				</div>
+				<div class="item">
+					<input type="text" name="tel" id="user_tel" value="$!{user.tel}"/>
+				</div>
+			</div>
+			<div class="formItem">
+				<div class="label">
+					<label for="user_email">邮箱</label>
+				</div>
+				<div class="item">
+					<input type="text" name="email" id="user_email" value="$!{user.email}"/>
+				</div>
+			</div>
+			<div class="formItem">
+				<div class="label">
+					<label for="user_memo">备注</label>
+				</div>
+				<div class="item">
+					<textarea name="memo" id="user_memo" value="$!{user.memo}" rows="3" cols="25"></textarea>
+				</div>
+			</div>
+		</div>
+		<div class="userInfo">
+			<div class="formItem">
+				<div class="label">
+					<input type="checkbox" name="fakepassword" id="user_changepassword" value="" style="border:0"/>
+					<label for="changepassword">修改密码</label>
+				</div>
+			</div>
+			<div id="user_passwordArea" style="display:none">
+				<div class="formItem">
+					<div class="label">
+						<label for="user_opassword">旧密码<font class="required">*</font></label>
+					</div>
+					<div class="item">
+						<input type="password" name="opassword" id="user_opassword" value=""/>
+					</div>
+				</div>
+				<div class="formItem">
+					<div class="label">
+						<label for="user_npassword">新密码<font class="required">*</font></label>
+					</div>
+					<div class="item">
+						<input type="password" name="npassword" id="user_npassword" value=""/>
+					</div>
+				</div>
+				<div class="formItem">
+					<div class="label">
+						<label for="user_confirmnpassword">重复新密码<font class="required">*</font></label>
+					</div>
+					<div class="item">
+						<input type="password" name="confirmnpassword" id="user_confirmnpassword" value=""/>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="userInfoSubmit">
+			<div class="button">
+				<input type="button" value="提交" onclick="bl_user.submitBegin()"/>
+			</div>
+			<div class="button">
+				<input type="reset" value="重置"/>
+			</div>
+		</div>
+	</form>
+</div>
+<script type="text/javascript">
+registerNamespace("bl_user");
+bl_user.checkUsernameUrl = APP_PATH + '/user/checkUsername.do';
+bl_user.updateUrl = APP_PATH + '/user/update.do';
+bl_user.messageBox = $("#user_message");
+
+bl_user.messageHandle = function (msg, success) {
+	bl_user.messageBox.html(msg);
+	bl_user.messageBox.show();
+	bl_user.messageBox.css('color', 'red');
+	if(success){
+		bl_user.messageBox.css('color', 'blue');
+	}
+	
+	bl_user.messageBox.fadeOut(7000);
+}
+
+bl_user.checkPasswordView = function () {
+	var passwordArea = $("#user_passwordArea");
+	if($("#user_changepassword").attr("checked")){
+		passwordArea.show();
+		passwordArea.find("input").attr("disabled",false); 
+	} else {
+		passwordArea.hide();
+		passwordArea.find("input").attr("disabled",true); 
+	}
+}
+
+bl_user.submitInfo = function(){
+	var param = $("#bl_user_editForm").serialize();
+	$.getJSON(bl_user.updateUrl, param, function(data){
+	    if(data.success){
+	    	bl_user.messageHandle("修改成功!", true);
+	    } else {
+	    	bl_user.messageHandle(data.msg, false);
+	    }
+    });
+}
+
+bl_user.checkUsername = function () {
+	var id = $("#user_id").val();
+	var username = $("#user_username").val();
+	var param = {id:id, username:username};
+	$.getJSON(bl_user.checkUsernameUrl, param, function(data){
+	    if(data.exist){
+	        bl_user.messageHandle("该登录名已经存在, 请重新输入!");
+	    } else {
+	    	bl_user.submitInfo();
+	    }
+    });
+}
+
+bl_user.checkPassword = function () {
+	if($("#user_changepassword").attr("checked")){
+		var pass0 = $("#user_opassword").val();
+		var pass1 = $("#user_npassword").val();
+		var pass2 = $("#user_confirmnpassword").val();
+		if(pass0 == ''){
+			bl_user.messageHandle("请输入旧密码!");
+			return false;
+		}
+		if(pass1 != pass2){
+			bl_user.messageHandle("两次新密码输入不一致, 请重新输入!");
+			return false;
+		}
+	}
+	
+	return true;
+}
+
+bl_user.requiredCheck = function (){
+	var name = $("#user_name").val();
+	var username = $("#user_username").val();
+	if(name == ''){
+		bl_user.messageHandle("用户名为必填项!");
+		return false;
+	}
+	if(username == ''){
+		bl_user.messageHandle("登录名为必填项!");
+		return false;
+	}
+	return true;
+}
+
+bl_user.submitBegin = function () {
+	if(bl_user.requiredCheck() &&
+		bl_user.checkPassword()){
+		bl_user.checkUsername();
+	}
+}
+
+$().ready(function(){
+	$("#user_changepassword").click(bl_user.checkPasswordView);
+	bl_user.checkPasswordView();
+});
+
+</script>

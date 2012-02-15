@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<rows>
+	<page>1</page>
+	<total>1</total>
+	<records>1</records>
+	#foreach($cell in $list)
+	<row>
+		<cell>$!{cell.id}</cell>
+		<cell>$!{cell.name}</cell>
+		<cell>$!{cell.cmCode}</cell>
+		<cell>$!{cell.cuCode}</cell>
+		<cell>$!{cell.parentId}</cell>
+		<cell>$!{cell.areaLink}</cell>
+		<cell>$!{cell.CreatedAtString}</cell>
+		<cell>$!{cell.treeLevel}</cell>
+		<cell>$!{cell.parentId}</cell>
+		<cell>$!{cell.leaf}</cell>
+		<cell>$!{cell.treeExpaned}</cell>
+	</row>
+	#end
+</rows>

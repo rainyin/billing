@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache>
+	<diskStore path="java.io.tmpdir" />
+	<defaultCache maxElementsInMemory="0" eternal="false"
+		timeToIdleSeconds="0" timeToLiveSeconds="0" overflowToDisk="false" />
+	
+	<cache name="com.rainy.billing.PROJECT_CACHE" maxElementsInMemory="50"
+		eternal="false" timeToIdleSeconds="600" timeToLiveSeconds="0"
+		overflowToDisk="false" memoryStoreEvictionPolicy="LRU" />
+</ehcache>

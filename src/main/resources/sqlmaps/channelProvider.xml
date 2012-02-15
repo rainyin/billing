@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rainy.billing.dao.impl.ChannelProviderDaoImpl" >
+
+    <resultMap type="ChannelProvider" id="ChannelProvider">
+		<id property="id" column="id"/>
+		<result property="createdAt" column="created_at"/>
+		<result property="updatedAt" column="updated_at"/>
+		<result property="operatorId" column="operator_id"/>
+		
+		<result property="name" column="name"/>
+		<result property="tel" column="tel"/>
+		<result property="address" column="address"/>
+		<result property="serviceCode" column="service_code"/>
+		<result property="cutPercent" column="cut_percent"/>
+		<result property="memo" column="memo"/>
+		
+		<collection property="smsChannels" ofType="SmsChannel">
+			<id property="id" column="cid"/>
+			<result property="businessName" column="business_name"/>
+		</collection>
+	</resultMap>
+
+	<select id="getEntityById" parameterType="long" resultMap="ChannelProvider">
+		select * from bl_channel_provider where id = #{value}
+	</select>
+	
+	<delete id="deleteEntityById" parameterType="long">
+		delete from bl_channel_provider where id = #{value}
+	</delete>
+	
+	<delete id="deleteEntityBatch">
+		delete from bl_channel_provider where id in
+		<foreach collection="array" item="id" open="(" close=")" separator=",">
+		#{id}
+		</foreach>
+	</delete>
+	
+	<update id="updateEntity" parameterType="ChannelProvider">
+		update bl_channel_provider
+		<set>
+			<if test="operatorId!=null">
+				operator_id = #{operatorId},
+			</if>
+			<if test="name!=null">
+				name = #{name},
+			</if>
+				tel = #{tel},
+				address = #{address},
+				service_code = #{serviceCode},
+				cut_percent = #{cutPercent},
+				memo = #{memo},
+			updated_at = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<insert id="createEntity" parameterType="ChannelProvider" useGeneratedKeys="true" keyProperty="id">
+		insert into bl_channel_provider 
+		(created_at, updated_at, operator_id, name, tel, address, service_code, cut_percent, memo) 
+		values 
+		(now(), now(), #{operatorId}, #{name}, #{tel}, #{address}, #{serviceCode}, #{cutPercent}, #{memo})
+	</insert>
+	
+	<select id="pageQueryEntityCount" parameterType="ChannelProviderVo" resultType="long">
+		select count(*) as num
+		<include refid="queryEntitySql"/>
+	</select>
+	
+	<select id="pageQueryEntity" parameterType="ChannelProviderVo" resultMap="ChannelProvider">
+		select *
+		<include refid="queryEntitySql"/>
+		<include refid="Common.pagingSql"/>
+	</select>
+	
+	<select id="queryEntity" parameterType="map" resultMap="ChannelProvider">
+		select *
+		<include refid="queryEntitySql"/>
+	</select>
+	
+	<select id="allEntity" resultMap="ChannelProvider">
+		select bcp.id, bcp.name, bc.id as cid, bc.business_name 
+	    from bl_channel_provider as bcp, bl_channel bc
+		where bcp.id = bc.channel_provider_id
+	</select>
+	
+	<sql id="queryEntitySql">
+		from bl_channel_provider as tt
+		<where>
+			<if test="name!=null">
+				and name like concat('%', #{name}, '%')
+			</if>
+			<if test="tel!=null">
+				and tel like concat('%', #{tel}, '%')
+			</if>
+			<if test="address!=null">
+				and address like concat('%', #{address}, '%')
+			</if>
+			<if test="serviceCode!=null">
+				and service_code like concat('%', #{serviceCode}, '%')
+			</if>
+			<if test="cutPercent!=null">
+				and cut_percent = #{cutPercent}
+			</if>
+			<if test="memo!=null">
+				and memo like concat('%', #{memo}, '%')
+			</if>
+		</where>
+	</sql>
+	
+</mapper>

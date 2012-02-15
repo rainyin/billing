@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+	<settings>
+		<setting name="cacheEnabled" value="false" />
+		<setting name="lazyLoadingEnabled" value="true" />
+	</settings>
+
+	<typeAliases>
+		<typeAlias alias="MySequence" type="com.rainy.billing.entity.MySequence" />
+		
+		<typeAlias alias="Customer" type="com.rainy.billing.entity.Customer" />
+		<typeAlias alias="CustomerVo" type="com.rainy.billing.model.CustomerVo" />
+		
+		<typeAlias alias="Project" type="com.rainy.billing.entity.Project" />
+		<typeAlias alias="ProjectVo" type="com.rainy.billing.model.ProjectVo" />
+		
+		<typeAlias alias="ChannelProvider" type="com.rainy.billing.entity.ChannelProvider" />
+		<typeAlias alias="ChannelProviderVo" type="com.rainy.billing.model.ChannelProviderVo" />
+		
+		<typeAlias alias="SmsChannel" type="com.rainy.billing.entity.SmsChannel" />
+		<typeAlias alias="SmsChannelVo" type="com.rainy.billing.model.SmsChannelVo" />
+		
+		<typeAlias alias="IvrChannel" type="com.rainy.billing.entity.IvrChannel" />
+		<typeAlias alias="IvrChannelVo" type="com.rainy.billing.model.IvrChannelVo" />
+		
+		<typeAlias alias="GpChannel" type="com.rainy.billing.entity.GpChannel" />
+		<typeAlias alias="GpChannelVo" type="com.rainy.billing.model.GpChannelVo" />
+		
+		<typeAlias alias="Question" type="com.rainy.billing.entity.Question" />
+		<typeAlias alias="QuestionVo" type="com.rainy.billing.model.QuestionVo" />
+		
+		<typeAlias alias="Area" type="com.rainy.billing.entity.Area" />
+		<typeAlias alias="AreaVo" type="com.rainy.billing.model.AreaVo" />
+		
+		<typeAlias alias="ChannelRequest" type="com.rainy.billing.entity.ChannelRequest" />
+		<typeAlias alias="ChannelRequestVo" type="com.rainy.billing.model.ChannelRequestVo" />
+		
+		<typeAlias alias="User" type="com.rainy.billing.entity.User" />
+		<typeAlias alias="UserVo" type="com.rainy.billing.model.UserVo" />
+		
+		<typeAlias alias="Right" type="com.rainy.billing.entity.Right" />
+		<typeAlias alias="RightVo" type="com.rainy.billing.model.RightVo" />
+		
+		<typeAlias alias="Resource" type="com.rainy.billing.entity.Resource" />
+		<typeAlias alias="ResourceVo" type="com.rainy.billing.model.ResourceVo" />
+		<typeAlias alias="ResourceRight" type="com.rainy.billing.model.ResourceRight" />
+		
+		<typeAlias alias="Role" type="com.rainy.billing.entity.Role" />
+		<typeAlias alias="RoleVo" type="com.rainy.billing.model.RoleVo" />
+		
+		<typeAlias alias="Blacklist" type="com.rainy.billing.entity.Blacklist" />
+		<typeAlias alias="BlacklistVo" type="com.rainy.billing.model.BlacklistVo" />
+		
+		<typeAlias alias="CatNumber" type="com.rainy.billing.entity.CatNumber" />
+		<typeAlias alias="CatNumberVo" type="com.rainy.billing.model.CatNumberVo" />
+		
+		<typeAlias alias="Terminal" type="com.rainy.billing.entity.Terminal" />
+		<typeAlias alias="TerminalVo" type="com.rainy.billing.model.TerminalVo" />
+		
+		<typeAlias alias="ReportVo" type="com.rainy.billing.model.report.ReportVo" />
+		<typeAlias alias="TerminalByAreaVo" type="com.rainy.billing.model.report.TerminalByAreaVo" />
+	</typeAliases>
+
+
+	<mappers>
+		<mapper resource="sqlmaps/common.xml" />
+		<mapper resource="sqlmaps/customer.xml" />
+		<mapper resource="sqlmaps/project.xml" />
+		<mapper resource="sqlmaps/channelProvider.xml" />
+		<mapper resource="sqlmaps/smsChannel.xml" />
+		<mapper resource="sqlmaps/ivrChannel.xml" />
+		<mapper resource="sqlmaps/gpChannel.xml" />
+		<mapper resource="sqlmaps/question.xml" />
+		<mapper resource="sqlmaps/area.xml" />
+		<mapper resource="sqlmaps/mySequence.xml" />
+		<mapper resource="sqlmaps/channelRequest.xml" />
+		<mapper resource="sqlmaps/user.xml" />
+		<mapper resource="sqlmaps/right.xml" />
+		<mapper resource="sqlmaps/resource.xml" />
+		<mapper resource="sqlmaps/role.xml" />
+		<mapper resource="sqlmaps/blacklist.xml" />
+		<mapper resource="sqlmaps/catNumber.xml" />
+		<mapper resource="sqlmaps/report.xml" />
+		<mapper resource="sqlmaps/terminal.xml" />
+	</mappers>
+</configuration>

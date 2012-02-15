@@ -1,0 +1,81 @@
+body {
+	color: #484848;
+	font-family: Verdana, sans-serif;
+	font-size: 12px;
+	margin: 0;
+	padding: 0;
+	text-align: center;
+}
+
+a,a:link,a:visited {
+	color: #2A5685;
+	text-decoration: none;
+	font-size: 12px;
+}
+
+form {
+	display: inline;
+}
+
+#login-form {
+	margin-left: 0 auto;
+	margin-right: 0 auto;
+}
+
+#login-form table {
+	margin-top: 5em;
+	padding: 1em;
+	margin-left: auto;
+	margin-right: auto;
+	border: 2px solid #FDBF3B;
+	background-color: #FFEBC1;
+}
+
+#login-form table td {
+	padding: 6px;
+}
+
+#login-form label {
+	font-weight: bold;
+	font-size: 12px;
+}
+
+#login-form input#iusername,#login-form input#ipassword,#login-form input#corporationCode
+	{
+	width: 300px;
+}
+
+input {
+	margin-bottom: 1px;
+	margin-top: 1px;
+	vertical-align: middle;
+}
+
+.error_msg {
+	background: no-repeat scroll 8px 50% #FFE3E3;
+	border-color: #DD0000;
+	color: #880000;
+	margin-top: 8px;
+	border: 2px solid;
+	font-size: 1.2em;
+	margin-bottom: 12px;
+	padding: 4px 4px 4px 30px;
+	display: none;
+}
+
+#header {
+	background-color: #507AAA;
+	color: #F8F8F8;
+	height: 5.3em;
+	margin: 0;
+	padding: 4px 8px 0 6px;
+	position: relative;
+}
+
+h1 {
+	font-size: 24px;
+	margin: 0;
+	padding: 0;
+	font-family: "Trebuchet MS", Verdana, sans-serif;
+	text-align: left;
+}

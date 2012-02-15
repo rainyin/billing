@@ -1,0 +1,88 @@
+<div class='tabContent'>
+	<div id="bl_report_term_param"></div>
+	<table id='bl_report_term_navgrid'></table>
+	<div id="bl_report_term_chart" style="display:none"></div>
+</div>
+
+<script type='text/javascript'>
+registerNamespace('bl_report_term');
+
+bl_report_term.query_url = APP_PATH + '/report/terminalQuery.do?';
+bl_report_term.queryByMonth_url = APP_PATH + '/report/terminalByMonthQuery.do?';
+
+$().ready(function(){
+	bl_report_term.reportParam = new ReportParam({
+		container: 'bl_report_term_param',
+		gridId: 'bl_report_term_navgrid',
+		month: '0',
+		chartId: 'bl_report_term_chart',
+		chartUrl: APP_PATH + '/report/terminalChart.do?'
+	});
+	$("#bl_report_term_param").find("select[name='year'] > option:first").before('<option value="">请选择</option>');
+	
+	bl_report_term.mygrid = $('#bl_report_term_navgrid').jqGrid( {
+		url : bl_report_term.query_url,
+		datatype : 'xml',
+		mtype : 'GET',
+		colNames : [  '月份', '数量' ],
+		colModel : [ {name : 'yearMonth',index : 'yearMonth',width : 400},
+		             {name : 'count', index : 'count', width : 400}
+	    ],
+		gridview : true,
+		sortable: false,
+		caption : '注册用户统计',
+		height : 350,
+		footerrow : true,
+		userDataOnFooter : true,
+		ondblClickRow: function(rowid, iRow, iCol, e){
+			var yearMonth = bl_report_term.mygrid.getRowData(rowid).yearMonth;
+			var projectId = $("#bl_report_term_param").find("select[name='projectId']").val();
+			
+			bl_report_term.yearMonthPopup(yearMonth, projectId);
+		}
+	});
+	
+	$("#bl_report_terminal_yearmonth").dialog({
+		autoOpen: false,
+		height: 500,
+		width: 350,
+		modal: true,
+		buttons: {
+			"关闭": function() {
+				$("#bl_report_terminal_yearmonth").dialog("close");
+			}
+		}
+	});
+});
+
+bl_report_term.yearMonthPopup = function(yearMonth, projectId){
+	var ym = yearMonth.split("/");
+	var year = ym[0];
+	var month = ym[1];
+
+	$("#bl_report_terminal_yearmonth").dialog("open");
+	
+	var urlWithParam = bl_report_term.queryByMonth_url + "year=" + year + "&month=" + month;
+	if(projectId) urlWithParam += ("&projectId" + projectId);
+	if(bl_report_term.yearMonthGrid){
+		bl_report_term.yearMonthGrid.setGridParam({url : urlWithParam});
+		bl_report_term.yearMonthGrid.trigger("reloadGrid");
+		return;
+	}
+	bl_report_term.yearMonthGrid = $("#bl_report_terminal_yearmonth_grid").jqGrid({
+				url : urlWithParam,
+				datatype : 'xml',
+				mtype : 'GET',
+				colNames : [  '日期', '数量' ],
+				colModel : [ {name : 'date',index : 'date',width : 200},
+				             {name : 'count', index : 'count', width : 100}
+			    ],
+				gridview : true,
+				sortable: false,
+				height : 350,
+			});	
+};
+</script>
+<div title="查看具体月份统计" style="display:none" id="bl_report_terminal_yearmonth">
+	<table id="bl_report_terminal_yearmonth_grid"></table>
+</div>

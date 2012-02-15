@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rows>
+	<records>${list.size()}</records>
+	#foreach($row in ${list})
+	<row id="$row.id">
+		<cell></cell>
+		<cell>$!row.id</cell>
+		<cell>$!row.businessName</cell>
+		<cell>$!row.sendTimes</cell>
+	</row>
+	#end
+</rows>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rainy.billing.dao.impl.CustomerDaoImpl" >
+
+    <resultMap type="Customer" id="Customer">
+		<id property="id" column="id"/>
+		<result property="createdAt" column="created_at"/>
+		<result property="updatedAt" column="updated_at"/>
+		<result property="operatorId" column="operator_id"/>
+		
+		<result property="name" column="name"/>
+		<result property="tel" column="tel"/>
+		<result property="address" column="address"/>
+		<result property="status" column="status"/>
+		<result property="memo" column="memo"/>
+	</resultMap>
+
+	<select id="getEntityById" parameterType="long" resultMap="Customer">
+		select * from bl_customer where id = #{value}
+	</select>
+	
+	<delete id="deleteEntityById" parameterType="long">
+		delete from bl_customer where id = #{value}
+	</delete>
+	
+	<delete id="deleteEntityBatch">
+		delete from bl_customer where id in
+		<foreach collection="array" item="id" open="(" close=")" separator=",">
+		#{id}
+		</foreach>
+	</delete>
+	
+	<update id="updateEntity" parameterType="Customer">
+		update bl_customer
+		<set>
+			<if test="operatorId!=null">
+				operator_id = #{operatorId},
+			</if>
+			<if test="name!=null">
+				name = #{name},
+			</if>
+				tel = #{tel},
+				address = #{address},
+			<if test="status!=null">
+				status = #{status},
+			</if>
+				memo = #{memo},
+			updated_at = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<insert id="createEntity" parameterType="Customer" useGeneratedKeys="true" keyProperty="id">
+		insert into bl_customer 
+		(created_at, updated_at, operator_id, name, tel, address, status, memo) 
+		values 
+		(now(), now(), #{operatorId}, #{name}, #{tel}, #{address}, #{status}, #{memo})
+	</insert>
+	
+	<select id="pageQueryEntityCount" parameterType="CustomerVo" resultType="long">
+		select count(*) as num
+		<include refid="queryEntitySql"/>
+	</select>
+	
+	<select id="pageQueryEntity" parameterType="CustomerVo" resultMap="Customer">
+		select *
+		<include refid="queryEntitySql"/>
+		<include refid="Common.pagingSql"/>
+	</select>
+	
+	<select id="queryEntity" parameterType="map" resultMap="Customer">
+		select *
+		<include refid="queryEntitySql"/>
+	</select>
+	
+	<sql id="queryEntitySql">
+		from bl_customer as tt
+		<where>
+			<if test="name!=null">
+				and name like concat('%', #{name}, '%')
+			</if>
+			<if test="tel!=null">
+				and tel like concat('%', #{tel}, '%')
+			</if>
+			<if test="address!=null">
+				and address like concat('%', #{address}, '%')
+			</if>
+			<if test="status!=null">
+				and status = #{status}
+			</if>
+			<if test="memo!=null">
+				and memo like concat('%', #{memo}, '%')
+			</if>
+		</where>
+	</sql>
+	
+</mapper>

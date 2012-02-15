@@ -1,0 +1,322 @@
+<div class="tabContent">
+	<table id="bl_gp_channel_navgrid">
+		<tr><td/></tr>
+	</table> 
+	<div id="bl_gp_channel_pagernav"></div> 
+</div>
+<script type="text/javascript">
+registerNamespace("bl_gp_channel");
+bl_gp_channel.query_url = APP_PATH + "/gpChannel/list.do";
+bl_gp_channel.oper_url = APP_PATH + "/gpChannel/operate.do";
+bl_gp_channel.channelProvider_url = APP_PATH + "/channelProvider/allChannelProvider.do";
+bl_gp_channel.queryArea_url = APP_PATH + "/gpChannel/queryArea.do";
+bl_gp_channel.associateArea_url = APP_PATH + "/gpChannel/associateArea.do";
+
+bl_gp_channel.areaSelectDialog = new AreaSelectDialog({
+	   gridId: 'bl_gp_channel_navgrid',
+	   container: 'bl_gp_channel_area_dialog',
+	   paramHiddenName: 'gpChannelId',
+	   width: 600,
+	   height: 500,
+	   remindTitle: '请选择G+通道!',
+	   queryUrl: bl_gp_channel.queryArea_url,
+	   submitUrl: bl_gp_channel.associateArea_url
+});
+
+$().ready(function(){
+	bl_gp_channel.mygrid = $("#bl_gp_channel_navgrid").jqGrid( {
+		url : bl_gp_channel.query_url,
+		datatype : 'xml',
+		mtype : 'GET',
+		colNames : [ '', '', '通道商', '名称', 'URL', '价格', '定制步骤', '退订执行日期', '退订指令' , '指令发送号码', '定制短信屏蔽关键字', '退订短信屏蔽关键字', '短信屏蔽周期', '手机型号', 'x-wap-profile', '备注', '创建日期' ],
+		colModel : [ {
+			name : 'id',
+			index : 'id',
+			hidden : true,
+			editable : true,
+			editoptions : {
+				defaultValue : ''
+			}
+		}, {
+			name : 'channelProviderId',
+			index : 'channelProviderId',
+			hidden : true,
+			editable : true,
+			editoptions : {
+				defaultValue : ''
+			}
+		}, {
+			name : 'channelProviderName',
+			index : 'channelProviderName',
+			width : 100,
+			editable : true,
+			edittype: 'select',
+			editoptions : {
+				dataUrl: bl_gp_channel.channelProvider_url,
+				dataEvents: [
+                      {  type: 'change',
+                         fn: function(e) {
+                            $('input#channelProviderId').val(this.value);
+                         }
+                      }
+                   ]
+			},
+			editrules : {
+				required : true,
+				edithidden: true
+			}
+		}, {
+			name : 'name',
+			index : 'name',
+			width : 100,
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true
+			}
+		}, {
+			name : 'url',
+			index : 'url',
+			width : 200,
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true
+			}
+		}, {
+			name : 'price',
+			index : 'price',
+			width : 60,
+			align : 'right',
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true,
+				number: true
+			},
+			formoptions: {
+				elmsuffix: '元'
+			}
+		}, {
+			name : 'custSteps',
+			index : 'custSteps',
+			width : 150,
+			align : 'right',
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true,
+				edithidden: true
+			},
+			formoptions: {
+				elmsuffix: 'xxx->yyy->'
+			}
+		}, {
+			name : 'cancelDay',
+			index : 'cancelDay',
+			width : 100,
+			align : 'right',
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true,
+				number: true
+			},
+			formoptions: {
+				elmsuffix: '日'
+			}
+		}, {
+			name : 'cancelInstruction',
+			index : 'cancelInstruction',
+			width : 100,
+			align : 'right',
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true,
+				edithidden: true
+			}
+		}, {
+			name : 'instructionTo',
+			index : 'instructionTo',
+			width : 120,
+			align : 'right',
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true,
+				edithidden: true
+			}
+		}, {
+			name : 'custShieldKey',
+			index : 'custShieldKey',
+			width : 120,
+			align : 'right',
+			editoptions : {
+				size : 20
+			},
+			editable : true,
+			editrules : {
+				required : true,
+				edithidden: true
+			},
+			formoptions: {
+				elmsuffix: 'xxx@yyy@'
+			}
+		}, {
+			name : 'cancelShieldKey',
+			index : 'cancelShieldKey',
+			width : 120,
+			align : 'right',
+			editoptions : {
+				size : 20
+			},
+			editable : true,
+			editrules : {
+				required : true,
+				edithidden: true
+			},
+			formoptions: {
+				elmsuffix: 'xxx@yyy@'
+			}
+		}, {
+			name : 'shieldCycle',
+			index : 'shieldCycle',
+			width : 120,
+			align : 'right',
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true,
+				number: true,
+				edithidden: true
+			},
+			formoptions: {
+				elmsuffix: '分钟'
+			}
+		}, {
+			name : 'phoneModel',
+			index : 'phoneModel',
+			width : 80,
+			align : 'right',
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true,
+				edithidden: true
+			}
+		}, {
+			name : 'xWapProfile',
+			index : 'xWapProfile',
+			width : 80,
+			align : 'right',
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true,
+				edithidden: true
+			}
+		}, {
+			name : 'memo',
+			index : 'memo',
+			width : 200,
+			sortable : false,
+			editable : true,
+			edittype : 'textarea',
+			editoptions : {
+				rows : "3",
+				cols : "25"
+			},
+			editrules: {
+				edithidden: true
+			}
+		}, {
+			name : 'createdAt',
+			index : 'createdAt',
+			width : 150,
+			search : false,
+			editable : false,
+			formatter : 'datetime'
+		}, ],
+		pager : '#bl_gp_channel_pagernav',
+		rowNum : 10,
+		rowList : [ 10, 20, 30 ],
+		sortname : 'id',
+		rownumbers : true,
+		sortorder : 'desc',
+		multiselect : false,
+		viewrecords : true,
+		gridview : true,
+		caption : 'G+通道管理',
+		editurl : bl_gp_channel.oper_url,
+		height : 300
+	});
+	$("#bl_gp_channel_navgrid").jqGrid('navGrid', '#bl_gp_channel_pagernav', 
+			{
+				search : false
+			}, 
+			{
+				reloadAfterSubmit : false,
+				width: 350,
+				recreateForm: true
+			}, 
+			{
+				reloadAfterSubmit : true,
+				width: 350,
+				recreateForm: true
+			}, 
+			{
+				reloadAfterSubmit : true
+			}, 
+			{
+				multipleSearch : false
+			} 
+			);
+	bl_gp_channel.mygrid.filterToolbar( {} );
+	$("#bl_gp_channel_navgrid").jqGrid('navButtonAdd', '#bl_gp_channel_pagernav', {
+		caption : "开关",
+		title : "开或关搜索栏",
+		onClickButton : function() {
+			$("#bl_gp_channel_navgrid")[0].toggleToolbar();
+		}
+	});
+	$("#bl_gp_channel_navgrid").jqGrid('navButtonAdd', '#bl_gp_channel_pagernav', {
+		caption : "清空",
+		title : "清空搜索栏",
+		onClickButton : function() {
+			$("#bl_gp_channel_navgrid")[0].clearToolbar();
+		}
+	});
+	$("#bl_gp_channel_navgrid").jqGrid('navButtonAdd', '#bl_gp_channel_pagernav', {
+		caption : "关联区域",
+		title : "关联区域",
+		onClickButton : function(){
+			bl_gp_channel.areaSelectDialog.onClickFunc();
+		}
+	});
+	bl_gp_channel.mygrid.hideCol(['memo', 'createdAt', 'channelProviderName', 'phoneModel', 'xWapProfile', 'cancelShieldKey', 'custShieldKey']);
+});
+
+</script>
+
+<div id="bl_gp_channel_area_dialog" style="display:none"></div>

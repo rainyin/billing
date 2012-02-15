@@ -1,0 +1,47 @@
+<script type="text/javascript">
+registerNamespace('bl_report_channel');
+
+bl_report_channel.smsChannel_url = APP_PATH + "/report/smsChannel.do";
+bl_report_channel.ivrChannel_url = APP_PATH + "/report/ivrChannel.do";
+bl_report_channel.gpChannel_url = APP_PATH + "/report/gpChannel.do";
+
+bl_report_channel.smsReport = function (){
+	$("#channelChart").empty();
+	var smsChannelChart = new FusionCharts(APP_PATH + "/static/chart/FCF_Column3D.swf", "sms", "950", "450", "0", "0");
+	smsChannelChart.setDataURL(bl_report_channel.smsChannel_url);
+	smsChannelChart.render("channelChart");
+}
+
+bl_report_channel.ivrReport = function (){
+	$("#channelChart").empty();
+	var ivrChannelChart = new FusionCharts(APP_PATH + "/static/chart/FCF_Column3D.swf", "ivr", "950", "450", "0", "0");
+	ivrChannelChart.setDataURL(bl_report_channel.ivrChannel_url);
+    ivrChannelChart.render("channelChart");
+}
+
+bl_report_channel.gpReport = function (){
+	$("#channelChart").empty();
+	var gpChannelChart = new FusionCharts(APP_PATH + "/static/chart/FCF_Column3D.swf", "gp", "950", "450", "0", "0");
+	gpChannelChart.setDataURL(bl_report_channel.gpChannel_url);
+    gpChannelChart.render("channelChart");
+}
+
+bl_report_channel.checkEvent = function(obj){
+	if(obj.checked && obj.value == '1') bl_report_channel.smsReport();
+	if(obj.checked && obj.value == '2') bl_report_channel.ivrReport();
+	if(obj.checked && obj.value == '3') bl_report_channel.gpReport();
+}
+
+$().ready(function(){
+	$("#ch_report_form").find("input:first").attr("checked", true);
+	bl_report_channel.smsReport();
+}); 
+</script>
+<div style="height:35px;" id="ch_report_form">
+	<input type="radio" name="radio_ch" value="1" onclick="bl_report_channel.checkEvent(this)">短信通道
+	<input type="radio" name="radio_ch" value="2" onclick="bl_report_channel.checkEvent(this)">IVR通道
+	<input type="radio" name="radio_ch" value="3" onclick="bl_report_channel.checkEvent(this)">G+通道
+</div>
+<div>
+	<div id="channelChart" style="padding:10px;"></div>
+</div>

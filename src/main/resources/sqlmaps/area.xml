@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rainy.billing.dao.impl.AreaDaoImpl" >
+
+    <resultMap type="Area" id="Area">
+		<id property="id" column="id"/>
+		<result property="createdAt" column="created_at"/>
+		<result property="updatedAt" column="updated_at"/>
+		<result property="operatorId" column="operator_id"/>
+		
+		<result property="name" column="name"/>
+		<result property="cmCode" column="cm_code"/>
+		<result property="cuCode" column="cu_code"/>
+		<result property="level" column="tel"/>
+		<result property="parentId" column="parent_id"/>
+		<result property="areaLink" column="area_link"/>
+		<result property="leaf" column="leaf"/>
+	</resultMap>
+
+	<select id="getEntityById" parameterType="long" resultMap="Area">
+		select * from bl_area where id = #{value}
+	</select>
+	
+	<delete id="deleteEntityById" parameterType="long">
+		delete from bl_area where id = #{value} or area_link like concat('%\_', #{value}, '\_%')
+	</delete>
+	
+	<update id="updateEntity" parameterType="Area">
+		update bl_area
+		<set>
+			<if test="operatorId!=null">
+				operator_id = #{operatorId},
+			</if>
+			<if test="parentId!=null">
+				parent_id = #{parentId},
+			</if>
+			<if test="areaLink!=null">
+				area_link = #{areaLink},
+			</if>
+			<if test="name!=null">
+				name = #{name},
+			</if>
+			<if test="cmCode!=null">
+				cm_code = #{cmCode},
+			</if>
+			<if test="cuCode!=null">
+				cu_code = #{cuCode},
+			</if>
+			<if test="level!=null">
+				level = #{level},
+			</if>
+			updated_at = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<insert id="createEntity" parameterType="Area" useGeneratedKeys="true" keyProperty="id">
+		insert into bl_area 
+		(created_at, updated_at, operator_id, name, cm_code, cu_code, level, parent_id, area_link) 
+		values 
+		(now(), now(), #{operatorId}, #{name}, #{cmCode}, #{cuCode}, #{level}, #{parentId}, #{areaLink})
+	</insert>
+	
+	<select id="queryEntityOfParent" resultMap="Area">
+		select ba.* from bl_area ba
+		where ba.parent_id in 
+		<foreach collection="array" item="id" open="(" close=")" separator=",">
+		#{id}
+		</foreach>
+	</select>
+	
+	<select id="queryEntityOfSmsChannel" parameterType="map" resultMap="Area">
+		select ba.* 
+		from bl_area ba, bl_area_sms_channel bac 
+		where ba.id = bac.area_id and bac.sms_channel_id = #{smsChannelId}
+	</select>
+	
+	<select id="queryEntityOfIvrChannel" parameterType="map" resultMap="Area">
+		select ba.* 
+		from bl_area ba, bl_area_ivr_channel baic 
+		where ba.id = baic.area_id and baic.ivr_channel_id = #{ivrChannelId}
+	</select>
+	
+	<select id="queryEntityOfGpChannel" parameterType="map" resultMap="Area">
+		select ba.* 
+		from bl_area ba, bl_area_gp_channel bagc
+		where ba.id = bagc.area_id and bagc.gp_channel_id = #{gpChannelId}
+	</select>
+	
+	<select id="queryEntity" parameterType="map" resultMap="Area">
+		select tt.*, if(count(baid) > 0, 0, 1) as leaf
+		from bl_area as tt left join (select id as baid, parent_id as baparent_id from bl_area) as baa on tt.id=baa.baparent_id
+		<where>
+			<if test="name!=null">
+				and tt.name like concat('%', #{name}, '%')
+			</if>
+			<if test="cmCode!=null">
+				and tt.cm_code like concat('%', #{cmCode}, '%')
+			</if>
+			<if test="cuCode!=null">
+				and tt.cu_code like concat('%', #{cuCode}, '%')
+			</if>
+			<if test="parentId!=null">
+				and tt.parent_id = #{parentId}
+			</if>
+		</where>
+		group by tt.id
+	</select>
+	
+</mapper>

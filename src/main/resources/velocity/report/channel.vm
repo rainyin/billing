@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graph caption='通道区域覆盖率(百分比)' xAxisName='通道名称' yAxisName='' decimalPrecision='0' baseFontSize='13' formatNumberScale='0'>
+	#foreach($item in $data)
+		#if($item.coverage >0)
+		<set name='$item.name' value='$item.coverage' color='$item.color'/>
+		#end
+	#end
+</graph>

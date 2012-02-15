@@ -1,0 +1,110 @@
+<html>
+	<head>
+		<title>setting</title>
+		<script type="text/javascript">
+		var nickName;
+		
+		$().ready(function(){
+			startChat();
+			
+			while(!nickName){
+				nickName = window.prompt("欢迎进入聊天室，请输入你的昵称: ");
+			}
+		});
+		
+		var msgArea;
+		var allMsg;
+		function startChat() {
+			PL.webRoot = '/';
+			p_join_listen('/demo/mychat');
+			
+			msgArea = $("#myMsg");
+			allMsg = $("#chatContent");
+			msgArea.focus();
+			msgArea.keypress(function(e){
+				if(e.which == '13'){
+					sendMsg();
+				}
+			});
+		}
+		
+		function onJoinListenAck(){
+			$.ajax({
+				url: APP_PATH + '/demo/chat/addSession.do',
+				success: function(){
+					renderAllContact();
+					setInterval(renderAllContact, 10000);
+				},
+				data: {'sessionId' : PL.sessionId, 'nickName' : nickName}
+			});
+		}
+		
+		function renderAllContact(){
+			$.ajax({
+				url: APP_PATH + '/demo/chat/allContact.do',
+				success: function(data){
+					$("#contactList").empty();
+					for(var i = 0 ; i < data.length ; i++) {
+						var contact = $("<a style='margin:5px;width:120px;height:30px;' href='#' onclick='contactEvent(this)' id='" + data[i].id + "'>" + data[i].name + "</a><br>");
+						$("#contactList").append(contact);
+					}
+				},
+				dataType: 'json'
+			});
+		}
+		
+		function contactEvent(obj){
+			//if(obj.id == PL_sessionId) return;
+			$("#contactList").find("a").css("border-bottom", "");
+			$(obj).css("border-bottom", "3px solid #ffffff");
+			$("#msgToHidden").val(obj.id);
+			$("#msgTo").val($(obj).html());
+		}
+
+	    function sendMsg(){
+	    	p_publish('/demo/mychat', 'nickName', nickName, 'content', msgArea.val(), 'p_to', $('#msgToHidden').val());
+	    	
+	    	msgArea.val('');
+	    	msgArea.focus();
+	    }
+	    
+	    function sendMsg1(){
+	    	$.ajax({
+	    		url: APP_PATH + "/demo/chat/send.do",
+	    		success: function(){},
+	    		data: { 'content' : msgArea.val(), 'nickName' : nickName}
+	    	});
+	    	
+	    	msgArea.val('');
+	    	msgArea.focus();
+	    }
+	    
+	    function onData(event) {
+	  		p_debug(false, "pushlet-app", 'event received event=' + event.getEvent() );
+			var content = '<b>' + event.get('nickName') + '</b>: <i>' + event.get('content') + '</i>';
+			
+			if(event.get('nickName')) {
+		        var old = allMsg.html();
+		        allMsg.html(old + '<br>' + content);
+			}
+		}
+	    
+	    
+	</script>
+	</head>
+	<body>
+		<div style="width:800px;height:430px;float:left;overflow:auto">
+			<div id="chatContent" style="width:700px;height:400px;overflow:auto;background-color:#aaaeee;border:1px solid #112233"></div>
+			<div>
+				<label for="myMsg">请输入:</label>
+				<input type="text" name="msg" id="myMsg" size="50"/>
+				<label for="msgTo">To:</label>
+				<input type="text" name="msgTo" id="msgTo" size="20"/>
+				<input type="hidden" name="msgToHidden" id="msgToHidden" size="20"/>
+			</div>
+		</div>
+		<div id="contactList" style="width:200px;height:400px;float:left;overflow:auto;border:1px solid #aaa222">
+			
+		</div>
+	</body>
+</html>

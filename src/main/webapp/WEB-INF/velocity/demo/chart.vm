@@ -1,0 +1,214 @@
+<html>
+	<head>
+		<title>setting</title>
+		<script type="text/javascript">
+		
+		var Area2D = new FusionCharts(APP_PATH + "/static/chart/FCF_Area2D.swf", "Area2D", "770", "350", "0", "0");
+		var Area2D_url = APP_PATH + "/demo/area2D.do";
+		function _Area2D(){
+			Area2D.setDataURL(Area2D_url);
+		    Area2D.render("Area2D");
+		}
+		
+		var Bar2D = new FusionCharts(APP_PATH + "/static/chart/FCF_Bar2D.swf", "Bar2D", "770", "350", "0", "0");
+		var Bar2D_url = APP_PATH + "/demo/bar2D.do";
+		function _Bar2D(){
+			Bar2D.setDataURL(Bar2D_url);
+		    Bar2D.render("Bar2D");
+		}
+		
+		var Candlestick = new FusionCharts(APP_PATH + "/static/chart/FCF_Candlestick.swf", "Candlestick", "770", "350", "0", "0");
+		var Candlestick_url = APP_PATH + "/demo/candlestick.do";
+		function _Candlestick(){
+			Candlestick.setDataURL(Candlestick_url);
+		    Candlestick.render("Candlestick");
+		}
+		
+		var Col2DLineDY = new FusionCharts(APP_PATH + "/static/chart/FCF_MSColumn2DLineDY.swf", "Col2DLineDY", "770", "350", "0", "0");
+		var Col2DLineDY_url = APP_PATH + "/demo/col2DLineDY.do";
+		function _Col2DLineDY(){
+			Col2DLineDY.setDataURL(Col2DLineDY_url);
+		    Col2DLineDY.render("Col2DLineDY");
+		}
+		
+		var Col3DLineDY = new FusionCharts(APP_PATH + "/static/chart/FCF_MSColumn3DLineDY.swf", "Col3DLineDY", "770", "350", "0", "0");
+		var Col3DLineDY_url = APP_PATH + "/demo/col3DLineDY.do";
+		function _Col3DLineDY(){
+			Col3DLineDY.setDataURL(Col3DLineDY_url);
+		    Col3DLineDY.render("Col3DLineDY");
+		}
+		
+		var Column2D = new FusionCharts(APP_PATH + "/static/chart/FCF_Column2D.swf", "Column2D", "770", "350", "0", "0");
+		var Column2D_url = APP_PATH + "/demo/column2D.do";
+		function _Column2D(){
+			Column2D.setDataURL(Column2D_url);
+		    Column2D.render("Column2D");
+		}
+		
+		var Column3D = new FusionCharts(APP_PATH + "/static/chart/FCF_Column3D.swf", "Column3D", "770", "350", "0", "0");
+		var Column3D_url = APP_PATH + "/demo/column3D.do";
+		function _Column3D(){
+			Column3D.setDataURL(Column3D_url);
+		    Column3D.render("Column3D");
+		}
+		
+		var Doughnut2D = new FusionCharts(APP_PATH + "/static/chart/FCF_Doughnut2D.swf", "Doughnut2D", "770", "350", "0", "0");
+		var Doughnut2D_url = APP_PATH + "/demo/doughnut2D.do";
+		function _Doughnut2D(){
+			Doughnut2D.setDataURL(Doughnut2D_url);
+		    Doughnut2D.render("Doughnut2D");
+		}
+		
+		var Funnel = new FusionCharts(APP_PATH + "/static/chart/FCF_Funnel.swf", "Funnel", "770", "350", "0", "0");
+		var Funnel_url = APP_PATH + "/demo/funnel.do";
+		function _Funnel(){
+			Funnel.setDataURL(Funnel_url);
+		    Funnel.render("Funnel");
+		}
+		
+		var Gantt = new FusionCharts(APP_PATH + "/static/chart/FCF_Gantt.swf", "Gantt", "770", "350", "0", "0");
+		var Gantt_url = APP_PATH + "/demo/gantt.do";
+		function _Gantt(){
+			Gantt.setDataURL(Gantt_url);
+		    Gantt.render("Gantt");
+		}
+		
+		var Line2D = new FusionCharts(APP_PATH + "/static/chart/FCF_Line.swf", "Line2D", "770", "350", "0", "0");
+		var Line2D_url = APP_PATH + "/demo/line2D.do";
+		function _Line2D(){
+			Line2D.setDataURL(Line2D_url);
+		    Line2D.render("Line2D");
+		}
+		
+		var MSArea2D = new FusionCharts(APP_PATH + "/static/chart/FCF_MSArea2D.swf", "MSArea2D", "770", "350", "0", "0");
+		var MSArea2D_url = APP_PATH + "/demo/mSArea2D.do";
+		function _MSArea2D(){
+			MSArea2D.setDataURL(MSArea2D_url);
+		    MSArea2D.render("MSArea2D");
+		}
+		
+		var MSBar2D = new FusionCharts(APP_PATH + "/static/chart/FCF_MSBar2D.swf", "MSBar2D", "770", "350", "0", "0");
+		var MSBar2D_url = APP_PATH + "/demo/mSBar2D.do";
+		function _MSBar2D(){
+			MSBar2D.setDataURL(MSBar2D_url);
+		    MSBar2D.render("MSBar2D");
+		}
+		
+		var MSColumn2D = new FusionCharts(APP_PATH + "/static/chart/FCF_MSColumn2D.swf", "MSColumn2D", "770", "350", "0", "0");
+		var MSColumn2D_url = APP_PATH + "/demo/mSColumn2D.do";
+		function _MSColumn2D(){
+			MSColumn2D.setDataURL(MSColumn2D_url);
+		    MSColumn2D.render("MSColumn2D");
+		}
+		
+		var MSColumn3D = new FusionCharts(APP_PATH + "/static/chart/FCF_MSColumn3D.swf", "MSColumn3D", "770", "350", "0", "0");
+		var MSColumn3D_url = APP_PATH + "/demo/mSColumn3D.do";
+		function _MSColumn3D(){
+			MSColumn3D.setDataURL(MSColumn3D_url);
+		    MSColumn3D.render("MSColumn3D");
+		}
+		
+		var MSLine = new FusionCharts(APP_PATH + "/static/chart/FCF_MSLine.swf", "MSLine", "770", "350", "0", "0");
+		var MSLine_url = APP_PATH + "/demo/mSLine.do";
+		function _MSLine(){
+			MSLine.setDataURL(MSLine_url);
+		    MSLine.render("MSLine");
+		}
+		
+		var Pie2D = new FusionCharts(APP_PATH + "/static/chart/FCF_Pie2D.swf", "Pie2D", "770", "350", "0", "0");
+		var Pie2D_url = APP_PATH + "/demo/pie2D.do";
+		function _Pie2D(){
+			Pie2D.setDataURL(Pie2D_url);
+		    Pie2D.render("Pie2D");
+		}
+		
+		var Pie3D = new FusionCharts(APP_PATH + "/static/chart/FCF_Pie3D.swf", "Pie3D", "770", "350", "0", "0");
+		var Pie3D_url = APP_PATH + "/demo/pie3D.do";
+		function _Pie3D(){
+			Pie3D.setDataURL(Pie3D_url);
+		    Pie3D.render("Pie3D");
+		}
+		
+		var StArea2D = new FusionCharts(APP_PATH + "/static/chart/FCF_StackedArea2D.swf", "StArea2D", "770", "350", "0", "0");
+		var StArea2D_url = APP_PATH + "/demo/stArea2D.do";
+		function _StArea2D(){
+			StArea2D.setDataURL(StArea2D_url);
+		    StArea2D.render("StArea2D");
+		}
+		
+		var StBar2D = new FusionCharts(APP_PATH + "/static/chart/FCF_StackedBar2D.swf", "StBar2D", "770", "350", "0", "0");
+		var StBar2D_url = APP_PATH + "/demo/stBar2D.do";
+		function _StBar2D(){
+			StBar2D.setDataURL(StBar2D_url);
+		    StBar2D.render("StBar2D");
+		}
+		
+		var StCol2D = new FusionCharts(APP_PATH + "/static/chart/FCF_StackedColumn2D.swf", "StCol2D", "770", "350", "0", "0");
+		var StCol2D_url = APP_PATH + "/demo/stCol2D.do";
+		function _StCol2D(){
+			StCol2D.setDataURL(StCol2D_url);
+		    StCol2D.render("StCol2D");
+		}
+		
+		var StCol3D = new FusionCharts(APP_PATH + "/static/chart/FCF_StackedColumn3D.swf", "StCol3D", "770", "350", "0", "0");
+		var StCol3D_url = APP_PATH + "/demo/stCol3D.do";
+		function _StCol3D(){
+			StCol3D.setDataURL(StCol3D_url);
+		    StCol3D.render("StCol3D");
+		}
+		
+		$().ready(init_page);
+		
+		function init_page(){
+			_Area2D();
+			_Bar2D();
+			_Candlestick();
+			_Col2DLineDY();
+			_Col3DLineDY();
+			_Column2D();
+			_Column3D();
+			_Doughnut2D();
+			_Funnel();
+			_Gantt();
+			_Line2D();
+			_MSArea2D();
+			_MSBar2D();
+			_MSColumn2D();
+			_MSColumn3D();
+			_MSLine();
+			_Pie2D();
+			_Pie3D();
+			_StArea2D();
+			_StBar2D();
+			_StCol2D();
+			_StCol3D();
+		}
+
+	</script>
+	</head>
+	<body>
+		<div>chart demo:</div>
+		<div id="Area2D"></div>
+		<div id="Bar2D"></div>
+		<div id="Candlestick"></div>
+		<div id="Col2DLineDY"></div>
+		<div id="Col3DLineDY"></div>
+		<div id="Column2D"></div>
+		<div id="Column3D"></div>
+		<div id="Doughnut2D"></div>
+		<div id="Funnel"></div>
+		<div id="Gantt"></div>
+		<div id="Line2D"></div>
+		<div id="MSArea2D"></div>
+		<div id="MSBar2D"></div>
+		<div id="MSColumn2D"></div>
+		<div id="MSColumn3D"></div>
+		<div id="MSLine"></div>
+		<div id="Pie2D"></div>
+		<div id="Pie3D"></div>
+		<div id="StArea2D"></div>
+		<div id="StBar2D"></div>
+		<div id="StCol2D"></div>
+		<div id="StCol3D"></div>
+	</body>
+</html>

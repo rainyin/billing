@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rainy.billing.dao.impl.ReportDaoImpl" >
+
+	<select id="allAreaCount" resultType="long">
+		select count(*) from bl_area
+	</select>
+	
+	<select id="querySmsChannel" resultMap="SmsChannel">	
+		select  bc.id, bc.business_name , bb.aid
+		from bl_sms_channel as bc
+		left join  (select ba.id as aid, ba.name as aname, bac.sms_channel_id
+		  from bl_area_sms_channel bac, bl_area ba where bac.area_id = ba.id) bb
+		on bc.id=bb.sms_channel_id 
+	</select>
+	
+	<select id="queryIvrChannel" resultMap="IvrChannel">	
+		select  bc.id, bc.name , bb.aid
+		from bl_ivr_channel as bc
+		left join  (select ba.id as aid, ba.name as aname, bac.ivr_channel_id
+		  from bl_area_ivr_channel bac, bl_area ba where bac.area_id = ba.id) bb
+		on bc.id=bb.ivr_channel_id
+	</select>
+	
+	<select id="queryGpChannel" resultMap="GpChannel">
+		select  bc.id, bc.name , bb.aid
+		from bl_ivr_channel as bc
+		left join  (select ba.id as aid, ba.name as aname, bac.gp_channel_id
+		  from bl_area_gp_channel bac, bl_area ba where bac.area_id = ba.id) bb
+		on bc.id=bb.gp_channel_id
+	</select>
+	
+	<select id="queryTerminal" parameterType="map" resultType="ReportVo">
+		select date_format(bt.created_at, '%Y/%m') as yearMonth, count(bt.id) as count from bl_terminal bt
+		<where>
+			<if test="projectId!=null">
+			and bt.project_id = #{projectId}
+			</if>
+			<if test="year!=null">
+			and bt.created_at between str_to_date(#{year},'%Y') and str_to_date(#{year} + 1,'%Y')
+			</if>
+		</where>
+		group by date_format(bt.created_at, '%Y/%m')
+		
+		<if test="orderBy!=null and orderBy!=''">
+		order by ${orderBy}
+		</if>
+		<if test="direction!=null and direction!=''">
+		${direction}
+		</if>
+	</select>
+	
+	<select id="queryTerminalByMonth" parameterType="map" resultType="ReportVo">
+		select date_format(bt.created_at, '%Y/%m/%d') as date, count(bt.id) as count from bl_terminal bt
+		<where>
+			<if test="projectId!=null">
+			and bt.project_id = #{projectId}
+			</if>
+			<if test="startDate!=null and endDate!=null">
+			and bt.created_at between #{startDate} and #{endDate}
+			</if>
+		</where>
+		group by date_format(bt.created_at, '%Y/%m/%d') 
+		<if test="orderBy!=null and orderBy!=''">
+		order by ${orderBy}
+		</if>
+		<if test="direction!=null and direction!=''">
+		${direction}
+		</if>
+	</select>
+	
+	<select id="queryTerminalByArea" parameterType="map" resultType="TerminalByAreaVo">
+		select ba.id, ba.parent_id as parentId, count(bt.id) as count from bl_terminal bt right join bl_area ba on (bt.area_code = ba.cm_code or bt.area_code = ba.cu_code)
+		<where>
+			<if test="projectId!=null">
+			and bt.project_id = #{projectId}
+			</if>
+			<if test="startDate!=null and endDate!=null">
+			and bt.created_at between #{startDate} and #{endDate}
+			</if>
+		</where>
+		group by ba.cm_code, ba.cu_code
+	</select>
+	
+	<select id="queryChannelRequest" parameterType="map" resultType="ReportVo">
+		select date_format(bcr.created_at, '%Y/%m/%d') as date, count(bcr.id) as count from bl_channel_request bcr
+		<where>
+			<if test="projectId!=null">
+			and bcr.project_id = #{projectId}
+			</if>
+			<if test="startDate!=null and endDate!=null">
+			and bcr.created_at between #{startDate} and #{endDate}
+			</if>
+		</where>
+		group by date_format(bcr.created_at, '%Y/%m/%d')
+		
+		<if test="orderBy!=null and orderBy!=''">
+		order by ${orderBy}
+		</if>
+		<if test="direction!=null and direction!=''">
+		${direction}
+		</if>
+	</select>
+	
+</mapper>

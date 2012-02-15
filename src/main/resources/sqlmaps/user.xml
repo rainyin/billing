@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rainy.billing.dao.impl.UserDaoImpl" >
+
+    <resultMap type="User" id="User">
+		<id property="id" column="id"/>
+		<result property="createdAt" column="created_at"/>
+		<result property="updatedAt" column="updated_at"/>
+		<result property="operatorId" column="operator_id"/>
+		
+		<result property="name" column="name"/>
+		<result property="password" column="password"/>
+		<result property="username" column="username"/>
+		<result property="status" column="status"/>
+		<result property="address" column="address"/>
+		<result property="tel" column="tel"/>
+		<result property="email" column="email"/>
+		<result property="memo" column="memo"/>
+		
+		<collection property="roles" ofType="Role">
+			<id property="id" column="rid"/>
+			<result property="name" column="rname"/>
+		</collection>
+	</resultMap>
+
+	<select id="getEntityById" parameterType="long" resultMap="User">
+		select * from bl_user where id = #{value}
+	</select>
+	
+	<select id="getEntityByUsername" parameterType="string" resultMap="User">
+		select * from bl_user where username = #{value} and status = 'ENABLED' limit 1
+	</select>
+	
+	<select id="countEntityByUsername" parameterType="map" resultType="long">
+		select count(*) from bl_user 
+		where username = #{username} 
+		<if test="id!=null">
+			and id != #{id}
+		</if>
+	</select>
+	
+	<delete id="deleteEntityById" parameterType="long">
+		delete from bl_user where id = #{value}
+	</delete>
+	
+	<delete id="deleteEntityBatch">
+		delete from bl_user where id in
+		<foreach collection="array" item="id" open="(" close=")" separator=",">
+		#{id}
+		</foreach>
+	</delete>
+	
+	<update id="updateEntity" parameterType="User">
+		update bl_user
+		<set>
+			<if test="operatorId!=null">
+				operator_id = #{operatorId},
+			</if>
+			<if test="name!=null">
+				name = #{name},
+			</if>
+			<if test="password!=null">
+				password = #{password},
+			</if>
+			<if test="username!=null">
+				username = #{username},
+			</if>
+			<if test="status!=null">
+				status = #{status},
+			</if>
+				address = #{address},
+				tel = #{tel},
+				email = #{email},
+				memo = #{memo},
+			updated_at = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<insert id="createEntity" parameterType="User" useGeneratedKeys="true" keyProperty="id">
+		insert into bl_user 
+		(created_at, updated_at, operator_id, name, password, username, status, address, tel , email, memo) 
+		values 
+		(now(), now(), #{operatorId}, #{name}, #{password}, #{username}, #{status}, #{address}, #{tel}, #{email}, #{memo})
+	</insert>
+	
+	<select id="pageQueryEntityCount" parameterType="UserVo" resultType="long">
+		select count(*) as num
+		<include refid="queryEntitySql"/>
+	</select>
+	
+	<select id="pageQueryEntity" parameterType="UserVo" resultMap="User">
+		select *
+		<include refid="queryEntitySql"/>
+		<include refid="Common.pagingSql"/>
+	</select>
+	
+	<select id="queryEntity" parameterType="map" resultMap="User">
+		select *
+		<include refid="queryEntitySql"/>
+	</select>
+	
+	<sql id="queryEntitySql">
+		from bl_user as tt 
+		left join 
+		(select bur.user_id, bur.role_id as rid, br.name as rname from bl_user_role as bur , bl_role as br where bur.role_id = br.id) as tmp
+		on tt.id = tmp.user_id
+		<where>
+			<if test="name!=null">
+				and name like concat('%', #{name}, '%')
+			</if>
+			<if test="username!=null">
+				and username like concat('%', #{username}, '%')
+			</if>
+			<if test="status!=null">
+				and status =  #{status}
+			</if>
+			<if test="address!=null">
+				and address like concat('%', #{address}, '%')
+			</if>
+			<if test="tel!=null">
+				and tel like concat('%', #{tel}, '%')
+			</if>
+			<if test="email!=null">
+				and email like concat('%', #{email}, '%')
+			</if>
+			<if test="memo!=null">
+				and memo like concat('%', #{memo}, '%')
+			</if>
+		</where>
+	</sql>
+	
+</mapper>

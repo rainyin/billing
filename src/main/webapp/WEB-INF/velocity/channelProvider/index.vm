@@ -1,0 +1,140 @@
+<div class="tabContent">
+	<table id="bl_channel_provider_navgrid">
+		<tr><td/></tr>
+	</table> 
+	<div id="bl_channel_provider_pagernav"></div> 
+</div>
+<script type="text/javascript">
+registerNamespace("bl_channel_provider");
+$().ready(function(){
+	bl_channel_provider.query_url = APP_PATH + "/channelProvider/list.do";
+	bl_channel_provider.oper_url = APP_PATH + "/channelProvider/operate.do";
+	bl_channel_provider.mygrid = $("#bl_channel_provider_navgrid").jqGrid( {
+		url : bl_channel_provider.query_url,
+		datatype : 'xml',
+		width: 900,
+		mtype : 'GET',
+		colNames : [ ' ', '名称', '联系电话', '地址', '服务代码', '分成比例', '备注', '创建日期' ],
+		colModel : [ {
+			name : 'id',
+			index : 'id',
+			hidden : true,
+			width : 900,
+			editable : true,
+			editoptions : {
+				defaultValue : ''
+			}
+		}, {
+			name : 'name',
+			index : 'name',
+			width : 150,
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true
+			}
+		}, {
+			name : 'tel',
+			index : 'tel',
+			width : 150,
+			editable : true,
+			editoptions : {
+				size : 20
+			}
+		}, {
+			name : 'address',
+			index : 'address',
+			width : 150,
+			align : 'right',
+			editable : true,
+			editoptions : {
+				size : 20
+			}
+		}, {
+			name : 'serviceCode',
+			index : 'serviceCode',
+			width : 100,
+			align : 'right',
+			editable : true,
+			editoptions : {
+				size : 20
+			}
+		}, {
+			name : 'cutPercent',
+			index : 'cutPercent',
+			width : 100,
+			align : 'right',
+			editable : true,
+			edittype: 'select',
+			editoptions : {
+ 				value: ':请选择;5:5;10:10;15:15;20:20;25:25;30:30;35:35;40:40;45:45;50:50;55:55;60:60;65:65;70:70;75:75;80:80;85:85;90:90;95:95;100:100'
+			},
+			stype: 'select'
+		}, {
+			name : 'memo',
+			index : 'memo',
+			width : 200,
+			sortable : false,
+			editable : true,
+			edittype : 'textarea',
+			editoptions : {
+				rows : "2",
+				cols : "25"
+			}
+		}, {
+			name : 'createdAt',
+			index : 'createdAt',
+			width : 150,
+			search : false,
+			editable : false,
+			formatter : 'datetime'
+		}, ],
+		pager : '#bl_channel_provider_pagernav',
+		rowNum : 10,
+		rowList : [ 10, 20, 30 ],
+		sortname : 'id',
+		rownumbers : true,
+		sortorder : 'desc',
+		multiselect : false,
+		viewrecords : true,
+		gridview : true,
+		caption : '客户管理',
+		editurl : bl_channel_provider.oper_url,
+		height : 300
+	});
+	$("#bl_channel_provider_navgrid").jqGrid('navGrid', '#bl_channel_provider_pagernav', 
+			{
+				search : false
+			}, 
+			{
+				reloadAfterSubmit : false
+			}, 
+			{
+				reloadAfterSubmit : true
+			}, 
+			{
+				reloadAfterSubmit : true
+			}, 
+			{
+				multipleSearch : false
+			} 
+			);
+	bl_channel_provider.mygrid.filterToolbar( {} );
+	$("#bl_channel_provider_navgrid").jqGrid('navButtonAdd', '#bl_channel_provider_pagernav', {
+		caption : "开关",
+		title : "开或关搜索栏",
+		onClickButton : function() {
+			$("#bl_channel_provider_navgrid")[0].toggleToolbar();
+		}
+	});
+	$("#bl_channel_provider_navgrid").jqGrid('navButtonAdd', '#bl_channel_provider_pagernav', {
+		caption : "清空",
+		title : "清空搜索栏",
+		onClickButton : function() {
+			$("#bl_channel_provider_navgrid")[0].clearToolbar();
+		}
+	});
+});
+</script>

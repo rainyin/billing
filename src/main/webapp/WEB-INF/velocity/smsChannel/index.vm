@@ -1,0 +1,286 @@
+<div class="tabContent">
+	<table id="bl_sms_channel_navgrid">
+		<tr><td/></tr>
+	</table> 
+	<div id="bl_sms_channel_pagernav"></div> 
+</div>
+<script type="text/javascript">
+registerNamespace("bl_sms_channel");
+bl_sms_channel.query_url = APP_PATH + "/smsChannel/list.do";
+bl_sms_channel.oper_url = APP_PATH + "/smsChannel/operate.do";
+bl_sms_channel.channelProvider_url = APP_PATH + "/channelProvider/allChannelProvider.do";
+bl_sms_channel.queryArea_url = APP_PATH + "/smsChannel/queryArea.do";
+bl_sms_channel.associateArea_url = APP_PATH + "/smsChannel/associateArea.do";
+
+bl_sms_channel.areaSelectDialog = new AreaSelectDialog({
+	   gridId: 'bl_sms_channel_navgrid',
+	   container: 'bl_sms_channel_area_dialog',
+	   paramHiddenName: 'smsChannelId',
+	   width: 600,
+	   height: 500,
+	   remindTitle: '请选择短信通道!',
+	   queryUrl: bl_sms_channel.queryArea_url,
+	   submitUrl: bl_sms_channel.associateArea_url
+});
+
+$().ready(function(){
+	bl_sms_channel.mygrid = $("#bl_sms_channel_navgrid").jqGrid( {
+		url : bl_sms_channel.query_url,
+		datatype : 'xml',
+		mtype : 'GET',
+		colNames : [ '', '', '通道商', '指令', '端口', '业务名称', '资费', '运营商', '匹配类型', '订购类型', '屏蔽周期', '关键字', '备注', '创建日期' ],
+		colModel : [ {
+			name : 'id',
+			index : 'id',
+			hidden : true,
+			editable : true,
+			editoptions : {
+				defaultValue : ''
+			}
+		}, {
+			name : 'channelProviderId',
+			index : 'channelProviderId',
+			hidden : true,
+			editable : true,
+			editoptions : {
+				defaultValue : ''
+			}
+		}, {
+			name : 'channelProviderName',
+			index : 'channelProviderName',
+			width : 100,
+			editable : true,
+			edittype: 'select',
+			editoptions : {
+				dataUrl: bl_sms_channel.channelProvider_url,
+				dataEvents: [
+                      {  type: 'change',
+                         fn: function(e) {
+                            $('input#channelProviderId').val(this.value);
+                         }
+                      }
+                   ]
+			},
+			editrules : {
+				required : true
+			}
+		}, {
+			name : 'instruction',
+			index : 'instruction',
+			width : 100,
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true,
+				edithidden: true
+			}
+		}, {
+			name : 'port',
+			index : 'port',
+			width : 100,
+			editable : true,
+			editoptions : {
+				size : 20,
+			},
+			editrules : {
+				required : true,
+				edithidden: true
+			}
+		}, {
+			name : 'businessName',
+			index : 'businessName',
+			width : 100,
+			align : 'right',
+			editable : true,
+			editoptions : {
+				size : 20
+			}
+		}, {
+			name : 'feeStandard',
+			index : 'feeStandard',
+			width : 80,
+			align : 'right',
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true,
+				number: true
+			},
+			formoptions: {
+				elmsuffix: '(单位：元)'
+			}
+		}, {
+			name : 'carrier',
+			index : 'carrier',
+			width : 80,
+			align : 'right',
+			editable : true,
+			edittype: 'select',
+			editoptions : {
+				value: 'CMCC:中国移动;CUCC:中国联通;CTC:中国电信'
+			},
+			editrules : {
+				required : true
+			},
+			stype: 'select',
+			searchoptions : {
+				value: ':请选择;CMCC:中国移动;CUCC:中国联通;CTC:中国电信'
+			}
+		}, {
+			name : 'matchType',
+			index : 'matchType',
+			width : 80,
+			align : 'right',
+			editable : true,
+			edittype: 'select',
+			editoptions : {
+				value: 'PRECISE:精确匹配;FUZZY:模糊匹配'
+			},
+			editrules : {
+				required : true
+			},
+			stype: 'select',
+			searchoptions : {
+				value: ':请选择;PRECISE:精确匹配;FUZZY:模糊匹配'
+			}
+		}, {
+			name : 'orderType',
+			index : 'orderType',
+			width : 80,
+			align : 'right',
+			editable : true,
+			edittype: 'select',
+			editoptions : {
+				value: 'MONTHLY:包月;ONDEMAND:点播'
+			},
+			editrules : {
+				required : true
+			},
+			stype: 'select',
+			searchoptions : {
+				value: ':请选择;ONDEMAND:点播;MONTHLY:包月'
+			},
+			formoptions: {
+				label: '点播/包月'
+			}
+		}, {
+			name : 'shieldCycle',
+			index : 'shieldCycle',
+			width : 80,
+			align : 'right',
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				number : true,
+				minValue: 11
+			},
+			formoptions: {
+				elmsuffix: '分钟'
+			}
+		}, {
+			name : 'shieldKey',
+			index : 'shieldKey',
+			width : 100,
+			align : 'right',
+			editable : true,
+			editoptions : {
+				size : 20,
+				maxlength: 250
+			},
+			editrules: {
+				edithidden: true,
+				required : true
+			},
+			formoptions: {
+				elmsuffix: 'xxx@|yyy@',
+				label: '下发短信屏蔽关键字'
+			}
+		}, {
+			name : 'memo',
+			index : 'memo',
+			width : 200,
+			sortable : false,
+			editable : true,
+			edittype : 'textarea',
+			editoptions : {
+				rows : "3",
+				cols : "25"
+			},
+			editrules: {
+				edithidden: true
+			}
+		}, {
+			name : 'createdAt',
+			index : 'createdAt',
+			width : 150,
+			search : false,
+			editable : false,
+			formatter : 'datetime'
+		} ],
+		pager : '#bl_sms_channel_pagernav',
+		rowNum : 10,
+		rowList : [ 10, 20, 30 ],
+		sortname : 'id',
+		rownumbers : true,
+		sortorder : 'desc',
+		multiselect : false,
+		viewrecords : true,
+		gridview : true,
+		caption : '短信通道管理',
+		editurl : bl_sms_channel.oper_url,
+		height : 300
+	});
+	$("#bl_sms_channel_navgrid").jqGrid('navGrid', '#bl_sms_channel_pagernav', 
+			{
+				search : false
+			}, 
+			{
+				reloadAfterSubmit : false,
+				width: 400,
+				recreateForm: true
+			}, 
+			{
+				reloadAfterSubmit : true,
+				width: 400,
+				recreateForm: true
+			}, 
+			{
+				reloadAfterSubmit : true
+			}, 
+			{
+				multipleSearch : false
+			} 
+			);
+	bl_sms_channel.mygrid.filterToolbar( {} );
+	$("#bl_sms_channel_navgrid").jqGrid('navButtonAdd', '#bl_sms_channel_pagernav', {
+		caption : "开关",
+		title : "开或关搜索栏",
+		onClickButton : function() {
+			$("#bl_sms_channel_navgrid")[0].toggleToolbar();
+		}
+	});
+	$("#bl_sms_channel_navgrid").jqGrid('navButtonAdd', '#bl_sms_channel_pagernav', {
+		caption : "清空",
+		title : "清空搜索栏",
+		onClickButton : function() {
+			$("#bl_sms_channel_navgrid")[0].clearToolbar();
+		}
+	});
+	$("#bl_sms_channel_navgrid").jqGrid('navButtonAdd', '#bl_sms_channel_pagernav', {
+		caption : "关联区域",
+		title : "关联区域",
+		onClickButton : function(){
+			bl_sms_channel.areaSelectDialog.onClickFunc();
+		}
+	});
+	bl_sms_channel.mygrid.hideCol(['shieldKey', 'memo']);
+});
+</script>
+
+<div id="bl_sms_channel_area_dialog" style="display:none"></div>

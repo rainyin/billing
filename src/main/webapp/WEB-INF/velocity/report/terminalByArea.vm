@@ -1,0 +1,35 @@
+<div class='tabContent'>
+	<div id="bl_report_term_barea_param"></div>
+	<table id='bl_report_term_barea_navgrid'></table>
+	<div id="bl_report_term_barea_chart" style="display:none"></div>
+</div>
+<script type='text/javascript'>
+registerNamespace('bl_report_term_barea');
+bl_report_term_barea.query_url = APP_PATH + '/report/terminalByAreaQuery.do?';
+
+$().ready(function(){
+	bl_report_term_barea.reportParam = new ReportParam({
+		container: 'bl_report_term_barea_param',
+		gridId: 'bl_report_term_barea_navgrid',
+		chartId: 'bl_report_term_barea_chart',
+		chartUrl: APP_PATH + '/report/terminalByAreaChart.do?'
+	});
+	
+	bl_report_term_barea.mygrid = $('#bl_report_term_barea_navgrid').jqGrid( {
+		url : bl_report_term_barea.query_url,
+		datatype : 'xml',
+		mtype : 'GET',
+		colNames : [  '省份', '数量' ],
+		colModel : [ {name : 'areaName',index : 'areaName',width : 400},
+		             {name : 'count', index : 'count', width : 400}
+	    ],
+		gridview : true,
+		caption : '归属地统计',
+		height : 350,
+		rowNum: 100,
+		footerrow : true,
+		userDataOnFooter : true,
+		altRows : true
+	});
+});
+</script>

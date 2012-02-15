@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rows>
+	#foreach($row in ${list})
+	<row>
+		<cell>$!{row.channelType}</cell>
+		<cell>$!{row.channelNames}</cell>
+	</row>
+	#end
+</rows>

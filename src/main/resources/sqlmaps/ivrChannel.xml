@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rainy.billing.dao.impl.IvrChannelDaoImpl" >
+
+    <resultMap type="IvrChannel" id="IvrChannel">
+		<id property="id" column="id"/>
+		<result property="createdAt" column="created_at"/>
+		<result property="updatedAt" column="updated_at"/>
+		<result property="operatorId" column="operator_id"/>
+		
+		<result property="channelProviderName" column="channel_provider_name"/>
+		<result property="channelProviderId" column="channel_provider_id"/>
+		<result property="name" column="name"/>
+		<result property="carrier" column="carrier"/>
+		<result property="dialNumber" column="dial_number"/>
+		<result property="callDuration" column="call_duration"/>
+		<result property="price" column="price"/>
+		<result property="keyOrder" column="key_order"/>
+		<result property="smsKey" column="sms_key"/>
+		<result property="delay" column="delay"/>
+		<result property="memo" column="memo"/>
+		
+		<collection property="areas" ofType="Area">
+			<id property="id" column="aid"/>
+			<result property="name" column="aname"/>
+			<result property="code" column="acode"/>
+		</collection>
+	</resultMap>
+
+	<select id="getEntityById" parameterType="long" resultMap="IvrChannel">
+		select * from bl_ivr_channel where id = #{value}
+	</select>
+	
+	<delete id="deleteEntityById" parameterType="long">
+		delete from bl_ivr_channel where id = #{value}
+	</delete>
+	
+	<delete id="deleteEntityBatch">
+		delete from bl_ivr_channel where id in
+		<foreach collection="array" item="id" open="(" close=")" separator=",">
+		#{id}
+		</foreach>
+	</delete>
+	
+	<update id="updateEntity" parameterType="IvrChannel">
+		update bl_ivr_channel
+		<set>
+			<if test="operatorId!=null">
+				operator_id = #{operatorId},
+			</if>
+			<if test="channelProviderName!=null">
+				channel_provider_name = #{channelProviderName},
+			</if>
+			<if test="channelProviderId!=null">
+				channel_provider_id = #{channelProviderId},
+			</if>
+			<if test="name!=null">
+				name = #{name},
+			</if>
+			<if test="carrier!=null">
+				carrier = #{carrier},
+			</if>
+			<if test="dialNumber!=null">
+				dial_number = #{dialNumber},
+			</if>
+			<if test="callDuration!=null">
+				call_duration = #{callDuration},
+			</if>
+			<if test="price!=null">
+				price = #{price},
+			</if>
+			<if test="keyOrder!=null">
+				key_order = #{keyOrder},
+			</if>
+			<if test="smsKey!=null">
+				sms_key = #{smsKey},
+			</if>
+			<if test="delay!=null">
+				delay = #{delay},
+			</if>
+				memo = #{memo},
+			updated_at = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<insert id="createEntity" parameterType="IvrChannel" useGeneratedKeys="true" keyProperty="id">
+		insert into bl_ivr_channel 
+		(created_at, updated_at, operator_id, channel_provider_name, channel_provider_id, name,carrier, dial_number, call_duration, price, key_order, sms_key, delay, memo) 
+		values 
+		(now(), now(), #{operatorId}, #{channelProviderName}, #{channelProviderId} ,#{name}, #{carrier} ,#{dialNumber} ,#{callDuration} ,#{price}, #{keyOrder} ,#{smsKey} , #{delay}, #{memo})
+	</insert>
+	
+	<select id="pageQueryEntityCount" parameterType="IvrChannelVo" resultType="long">
+		select count(*) as num
+		<include refid="queryEntitySql"/>
+	</select>
+	
+	<select id="pageQueryEntity" parameterType="IvrChannelVo" resultMap="IvrChannel">
+		select *
+		<include refid="queryEntitySql"/>
+		<include refid="Common.pagingSql"/>
+	</select>
+	
+	<select id="queryEntity" parameterType="map" resultMap="IvrChannel">
+		select *
+		<include refid="queryEntitySql"/>
+	</select>
+	
+	<insert id="associateWithArea" parameterType="map">
+		insert into bl_area_ivr_channel(created_at, updated_at, operator_id, area_id, ivr_channel_id) values 
+		<foreach collection="areaId" item="aId"  separator=",">
+		(now(), now(), #{operatorId}, #{aId}, #{ivrChannelId})
+		</foreach>
+	</insert>
+	
+	<delete id="unassociateWithArea" parameterType="long">
+		delete from bl_area_ivr_channel where ivr_channel_id = #{value}
+	</delete>
+	
+	<select id="queryEntityOfProject" parameterType="map" resultMap="IvrChannel">	
+		select bc.* 
+		from bl_ivr_channel as bc, bl_ivr_channel_project bcp 
+		where 
+		bc.id = bcp.ivr_channel_id 
+		and bcp.project_id = #{projectId} 
+		order by bcp.id
+	</select>
+	
+	<sql id="queryEntitySql">
+		from bl_ivr_channel as tt
+		<where>
+			<if test="channelProviderName!=null">
+				and channel_provider_name like  concat('%', #{channelProviderName}, "%")
+			</if>
+			<if test="channelProviderId!=null">
+				and channel_provider_Id = #{channelProviderId}
+			</if>
+			<if test="name!=null">
+				and name like concat('%', #{name}, "%")
+			</if>
+			<if test="carrier!=null">
+				and carrier = #{carrier}
+			</if>
+			<if test="dialNumber!=null">
+				and dial_number like concat('%', #{dialNumber}, "%")
+			</if>
+			<if test="callDuration!=null">
+				and call_duration like concat('%', #{callDuration}, "%")
+			</if>
+			<if test="price!=null">
+				and price = #{price}
+			</if>
+			<if test="delay!=null">
+				and delay = #{delay}
+			</if>
+			<if test="keyOrder!=null">
+				and key_order like concat('%', #{keyOrder}, "%")
+			</if>
+			<if test="smsKey!=null">
+				and sms_key like concat('%', #{smsKey}, "%")
+			</if>
+			<if test="memo!=null">
+				and memo like concat('%', #{memo}, "%")
+			</if>
+		</where>
+	</sql>
+	
+</mapper>

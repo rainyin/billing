@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rainy.billing.dao.impl.SmsChannelDaoImpl" >
+
+    <resultMap type="SmsChannel" id="SmsChannel">
+		<id property="id" column="id"/>
+		<result property="createdAt" column="created_at"/>
+		<result property="updatedAt" column="updated_at"/>
+		<result property="operatorId" column="operator_id"/>
+		
+		<result property="channelProviderName" column="channel_provider_name"/>
+		<result property="channelProviderId" column="channel_provider_id"/>
+		<result property="instruction" column="instruction"/>
+		<result property="port" column="port"/>
+		<result property="businessName" column="business_name"/>
+		<result property="feeStandard" column="fee_standard"/>
+		<result property="carrier" column="carrier"/>
+		<result property="matchType" column="match_type"/>
+		<result property="orderType" column="order_type"/>
+		<result property="sendTimes" column="send_times"/>
+		<result property="shieldCycle" column="shield_cycle"/>
+		<result property="shieldKey" column="shield_key"/>
+		<result property="memo" column="memo"/>
+		
+		<collection property="areas" ofType="Area">
+			<id property="id" column="aid"/>
+			<result property="name" column="aname"/>
+			<result property="code" column="acode"/>
+		</collection>
+	</resultMap>
+
+	<select id="getEntityById" parameterType="long" resultMap="SmsChannel">
+		select * from bl_sms_channel where id = #{value}
+	</select>
+	
+	<delete id="deleteEntityById" parameterType="long">
+		delete from bl_sms_channel where id = #{value}
+	</delete>
+	
+	<delete id="deleteEntityBatch">
+		delete from bl_sms_channel where id in
+		<foreach collection="array" item="id" open="(" close=")" separator=",">
+		#{id}
+		</foreach>
+	</delete>
+	
+	<update id="updateEntity" parameterType="SmsChannel">
+		update bl_sms_channel
+		<set>
+			<if test="operatorId!=null">
+				operator_id = #{operatorId},
+			</if>
+			<if test="channelProviderName!=null">
+				channel_provider_name = #{channelProviderName},
+			</if>
+			<if test="channelProviderId!=null">
+				channel_provider_id = #{channelProviderId},
+			</if>
+			<if test="instruction!=null">
+				instruction = #{instruction},
+			</if>
+			<if test="port!=null">
+				port = #{port},
+			</if>
+			<if test="businessName!=null">
+				business_name = #{businessName},
+			</if>
+			<if test="feeStandard!=null">
+				fee_standard = #{feeStandard},
+			</if>
+			<if test="carrier!=null">
+				carrier = #{carrier},
+			</if>
+			<if test="matchType!=null">
+				match_type = #{matchType},
+			</if>
+			<if test="orderType!=null">
+				order_type = #{orderType},
+			</if>
+			<if test="shieldCycle!=null">
+				shield_cycle = #{shieldCycle},
+			</if>
+			<if test="shieldKey!=null">
+				shield_key = #{shieldKey},
+			</if>
+				memo = #{memo},
+			updated_at = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<insert id="createEntity" parameterType="SmsChannel" useGeneratedKeys="true" keyProperty="id">
+		insert into bl_sms_channel 
+		(created_at, updated_at, operator_id, channel_provider_name, channel_provider_id, instruction, port, business_name,
+		fee_standard, carrier, match_type, order_type, shield_cycle, shield_key, memo) 
+		values 
+		(now(), now(), #{operatorId}, #{channelProviderName}, #{channelProviderId}, #{instruction}, #{port}, #{businessName},
+		 #{feeStandard},#{carrier},#{matchType},#{orderType},#{shieldCycle},#{shieldKey},#{memo})
+	</insert>
+	
+	<select id="pageQueryEntityCount" parameterType="SmsChannelVo" resultType="long">
+		select count(*) as num
+		<include refid="queryEntitySql"/>
+	</select>
+	
+	<select id="pageQueryEntity" parameterType="SmsChannelVo" resultMap="SmsChannel">
+		select *
+		<include refid="queryEntitySql"/>
+		<include refid="Common.pagingSql"/>
+	</select>
+	
+	<select id="queryEntity" parameterType="map" resultMap="SmsChannel">
+		select *
+		<include refid="queryEntitySql"/>
+	</select>
+	
+	<insert id="associateWithArea" parameterType="map">
+		insert into bl_area_sms_channel(created_at, updated_at, operator_id, area_id, sms_channel_id) values 
+		<foreach collection="areaId" item="aId"  separator=",">
+		(now(), now(), #{operatorId}, #{aId}, #{smsChannelId})
+		</foreach>
+	</insert>
+	
+	<delete id="unassociateWithArea" parameterType="long">
+		delete from bl_area_sms_channel where sms_channel_id = #{value}
+	</delete>
+	
+	<select id="queryEntityOfProject" parameterType="map" resultMap="SmsChannel">	
+		select bc.*, bcp.send_times
+	    from bl_sms_channel as bc,  bl_sms_channel_project bcp 
+	    where 
+	    bc.id = bcp.sms_channel_id 
+	    and bcp.project_id = #{projectId}
+	    <if test="businessName!=null">
+			and bc.business_name like concat('%', #{businessName}, "%")
+		</if>
+	    order by bcp.id
+	</select>
+	
+	<select id="queryEntityNotOfProject" parameterType="map" resultMap="SmsChannel">	
+		select bc.*
+	    from bl_sms_channel as bc
+	    where 
+	    not exists (
+	    	select 1 from bl_sms_channel_project bcp 
+	    	where bc.id = bcp.sms_channel_id and bcp.project_id = #{projectId} 
+	    )
+	    <if test="businessName!=null">
+			and bc.business_name like concat('%', #{businessName}, "%")
+		</if>
+	</select>
+	
+	<sql id="queryEntitySql">
+		from bl_sms_channel as tt
+		<where>
+			<if test="channelProviderName!=null">
+				and channel_provider_name like  concat('%', #{channelProviderName}, "%")
+			</if>
+			<if test="channelProviderId!=null">
+				and channel_provider_Id = #{channelProviderId}
+			</if>
+			<if test="instruction!=null">
+				and instruction like concat('%', #{instruction}, "%")
+			</if>
+			<if test="port!=null">
+				and port like concat('%', #{port}, "%")
+			</if>
+			<if test="businessName!=null">
+				and business_name like concat('%', #{businessName}, "%")
+			</if>
+			<if test="feeStandard!=null">
+				and fee_standard = #{feeStandard}
+			</if>
+			<if test="carrier!=null">
+				and carrier = #{carrier}
+			</if>
+			<if test="matchType!=null">
+				and match_type = #{matchType}
+			</if>
+			<if test="orderType!=null">
+				and order_type = #{orderType}
+			</if>
+			<if test="shieldCycle!=null">
+				and shield_cycle = #{shieldCycle}
+			</if>
+			<if test="shieldKey!=null">
+				and shield_key like concat('%', #{shieldKey}, "%")
+			</if>
+			<if test="memo!=null">
+				and memo like concat('%', #{memo}, "%")
+			</if>
+		</where>
+	</sql>
+	
+</mapper>

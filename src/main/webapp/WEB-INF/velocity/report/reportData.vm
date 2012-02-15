@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rows>
+	#set($total=0)
+	#set($rid=0)
+	#foreach($row in ${data.details})
+	<row id="tbyarea-$!rid">
+		<cell>$!row.name</cell>
+		<cell>$!row.count</cell>
+		#set($total = $total + $row.count)
+		#set($rid = $rid + 1)
+	</row>
+	#end
+	<userdata name="${data.nameHeader}">总计</userdata>
+	<userdata name="${data.countHeader}">$!total</userdata>
+</rows>
+	

@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rainy.billing.dao.impl.GpChannelDaoImpl" >
+
+    <resultMap type="GpChannel" id="GpChannel">
+		<id property="id" column="id"/>
+		<result property="createdAt" column="created_at"/>
+		<result property="updatedAt" column="updated_at"/>
+		<result property="operatorId" column="operator_id"/>
+		
+		<result property="channelProviderName" column="channel_provider_name"/>
+		<result property="channelProviderId" column="channel_provider_id"/>
+		<result property="name" column="name"/>
+		
+		<result property="url" column="url"/>
+		<result property="price" column="price"/>
+		<result property="custSteps" column="cust_steps"/>
+		<result property="cancelDay" column="cancel_day"/>
+		<result property="cancelInstruction" column="cancel_instruction"/>
+		<result property="instructionTo" column="instruction_to"/>
+		<result property="custShieldKey" column="cust_shield_key"/>
+		<result property="cancelShieldKey" column="cancel_shield_key"/>
+		<result property="shieldCycle" column="shield_cycle"/>
+		<result property="phoneModel" column="phone_model"/>
+		<result property="xWapProfile" column="x_wap_profile"/>
+		<result property="memo" column="memo"/>
+		
+		<collection property="areas" ofType="Area">
+			<id property="id" column="aid"/>
+			<result property="name" column="aname"/>
+			<result property="code" column="acode"/>
+		</collection>
+	</resultMap>
+
+	<select id="getEntityById" parameterType="long" resultMap="GpChannel">
+		select * from bl_gp_channel where id = #{value}
+	</select>
+	
+	<delete id="deleteEntityById" parameterType="long">
+		delete from bl_gp_channel where id = #{value}
+	</delete>
+	
+	<delete id="deleteEntityBatch">
+		delete from bl_gp_channel where id in
+		<foreach collection="array" item="id" open="(" close=")" separator=",">
+		#{id}
+		</foreach>
+	</delete>
+	
+	<update id="updateEntity" parameterType="GpChannel">
+		update bl_gp_channel
+		<set>
+			<if test="operatorId!=null">
+				operator_id = #{operatorId},
+			</if>
+			<if test="channelProviderName!=null">
+				channel_provider_name = #{channelProviderName},
+			</if>
+			<if test="channelProviderId!=null">
+				channel_provider_id = #{channelProviderId},
+			</if>
+			<if test="name!=null">
+				name = #{name},
+			</if>
+			<if test="url!=null">
+				url = #{url},
+			</if>
+			<if test="price!=null">
+				price = #{price},
+			</if>
+			<if test="custSteps!=null">
+				cust_steps = #{custSteps},
+			</if>
+			<if test="cancelDay!=null">
+				cancel_day = #{cancelDay},
+			</if>
+			<if test="cancelInstruction!=null">
+				cancel_instruction = #{cancelInstruction},
+			</if>
+			<if test="instructionTo!=null">
+				instruction_to = #{instructionTo},
+			</if>
+			<if test="custShieldKey!=null">
+				cust_shield_key = #{custShieldKey},
+			</if>
+			<if test="cancelShieldKey!=null">
+				cancel_shield_key = #{cancelShieldKey},
+			</if>
+			<if test="shieldCycle!=null">
+				shield_cycle = #{shieldCycle},
+			</if>
+				phone_model = #{phoneModel},
+				x_wap_profile = #{xWapProfile},
+				memo = #{memo},
+			updated_at = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<insert id="createEntity" parameterType="GpChannel" useGeneratedKeys="true" keyProperty="id">
+		insert into bl_gp_channel 
+		(created_at, updated_at, operator_id, channel_provider_name, channel_provider_id, name, url, price, cust_steps, cancel_day, cancel_instruction, instruction_to, cust_shield_key, cancel_shield_key,  shield_cycle, phone_model, x_wap_profile, memo) 
+		values 
+		(now(), now(), #{operatorId}, #{channelProviderName}, #{channelProviderId} ,#{name} ,#{url} ,#{price} ,#{custSteps} ,#{cancelDay} ,#{cancelInstruction} ,#{instructionTo} ,#{custShieldKey}, #{cancelShieldKey}, #{shieldCycle}, #{phoneModel}, #{xWapProfile}, #{memo})
+	</insert>
+	
+	<select id="pageQueryEntityCount" parameterType="GpChannelVo" resultType="long">
+		select count(*) as num
+		<include refid="queryEntitySql"/>
+	</select>
+	
+	<select id="pageQueryEntity" parameterType="GpChannelVo" resultMap="GpChannel">
+		select *
+		<include refid="queryEntitySql"/>
+		<include refid="Common.pagingSql"/>
+	</select>
+	
+	<select id="queryEntity" parameterType="map" resultMap="GpChannel">
+		select *
+		<include refid="queryEntitySql"/>
+	</select>
+	
+	<insert id="associateWithArea" parameterType="map">
+		insert into bl_area_gp_channel(created_at, updated_at, operator_id, area_id, gp_channel_id) values 
+		<foreach collection="areaId" item="aId"  separator=",">
+		(now(), now(), #{operatorId}, #{aId}, #{gpChannelId})
+		</foreach>
+	</insert>
+	
+	<delete id="unassociateWithArea" parameterType="long">
+		delete from bl_area_gp_channel where gp_channel_id = #{value}
+	</delete>
+	
+	<select id="queryEntityOfProject" parameterType="map" resultMap="GpChannel">	
+		select bc.* 
+		from bl_gp_channel as bc, bl_gp_channel_project bcp 
+		where 
+		bc.id = bcp.gp_channel_id 
+		and bcp.project_id = #{projectId} 
+		order by bcp.id
+	</select>
+	
+	<sql id="queryEntitySql">
+		from bl_gp_channel as tt
+		<where>
+			<if test="channelProviderName!=null">
+				and channel_provider_name like  concat('%', #{channelProviderName}, "%")
+			</if>
+			<if test="channelProviderId!=null">
+				and channel_provider_Id = #{channelProviderId}
+			</if>
+			<if test="name!=null">
+				and name like concat('%', #{name}, "%")
+			</if>
+			<if test="url!=null">
+				and url like concat('%', #{url}, "%")
+			</if>
+			<if test="price!=null">
+				and price = #{price}
+			</if>
+			<if test="custSteps!=null">
+				and cust_steps like concat('%', #{custSteps}, "%")
+			</if>
+			<if test="cancelDay!=null">
+				and cancel_day = #{cancelDay}
+			</if>
+			<if test="cancelInstruction!=null">
+				and cancel_instruction like concat('%', #{cancelInstruction}, "%")
+			</if>
+			<if test="instructionTo!=null">
+				and instruction_to like concat('%', #{instructionTo}, "%")
+			</if>
+			<if test="custShieldKey!=null">
+				and cust_shield_key like concat('%', #{custShieldKey}, "%")
+			</if>
+			<if test="cancelShieldKey!=null">
+				and cancel_shield_key like concat('%', #{cancelShieldKey}, "%")
+			</if>
+			<if test="shieldCycle!=null">
+				and shield_cycle = #{shieldCycle}
+			</if>
+			<if test="phoneModel!=null">
+				and phone_model like concat('%', #{phoneModel}, "%")
+			</if>
+			<if test="xWapProfile!=null">
+				and x_wap_profile like concat('%', #{xWapProfile}, "%")
+			</if>
+			<if test="memo!=null">
+				and memo like concat('%', #{memo}, "%")
+			</if>
+		</where>
+	</sql>
+	
+</mapper>

@@ -1,0 +1,152 @@
+<div>
+	<div style="float:left;margin:10px;">
+		<table id="bl_project_assosms_avai">
+			<tr><td/></tr>
+		</table>
+	</div>
+	<div style="float:left;margin:5px;height:350px;" id="bl_project_assosms_oper">
+		<button style="width:40px;margin-top:120px;" onclick="bl_project_assosms.assoSmsAll();"> >> </button><br>
+		<button style="width:40px;margin-top:10px;" onclick="bl_project_assosms.assoSmsSingle();">  > </button><br>
+		<button style="width:40px;margin-top:10px;" onclick="bl_project_assosms.delAssoSmsAll();">  << </button><br>
+		<button style="width:40px;margin-top:10px;" onclick="bl_project_assosms.delAssoSmsSingle();">  < </button><br>
+	</div>
+	<div style="float:left;margin:10px;">
+		<table id="bl_project_assosms_asso">
+			<tr><td/></tr>
+		</table>
+	</div>
+</div>
+
+<script type="text/javascript">
+	registerNamespace("bl_project_assosms");
+	
+	bl_project_assosms.projectId = 1010;
+	
+	bl_project_assosms.getAvaibleSmsChannel_url = APP_PATH + "/project/getAvaibleSmsChannel.do?projectId=" + bl_project_assosms.projectId;
+	bl_project_assosms.getAssociateSmsChannel_url = APP_PATH + "/project/getAssociateSmsChannel.do?projectId=" + bl_project_assosms.projectId;
+	
+	bl_project_assosms.associateSmsChannel_url = APP_PATH + "/project/associateSms.do";
+	bl_project_assosms.deAssociateSmsChannel_url = APP_PATH + "/project/deAssociateSms.do";
+	bl_project_assosms.updateSendTimes_url = APP_PATH + "/project/updateSendTimes.do?projectId=" + bl_project_assosms.projectId;
+	
+	bl_project_assosms.assoSmsSingle = function(){
+		var smsId = bl_project_assosms.leftGrid.getGridParam('selrow');
+		if(smsId){
+			$.get(bl_project_assosms.associateSmsChannel_url, {projectId: bl_project_assosms.projectId,smsChannelId: smsId}, function(){
+				var rowData = bl_project_assosms.leftGrid.getRowData(smsId);
+				rowData.sendTimes = 0;
+				
+				bl_project_assosms.rightGrid.addRowData(smsId, rowData);
+				bl_project_assosms.leftGrid.delRowData(smsId);
+			});
+		}
+	};
+	
+	bl_project_assosms.assoSmsAll = function(){
+		var smsIds = bl_project_assosms.leftGrid.getDataIDs() + "";
+		
+		if(smsIds){
+			var ids = smsIds.split(",");
+			var param = $.param({projectId : bl_project_assosms.projectId, smsChannelId: ids}, true);
+			$.get(bl_project_assosms.associateSmsChannel_url, param, function(){
+				for(var i = 0; i < ids.length; i++) {
+					var rowData = bl_project_assosms.leftGrid.getRowData(ids[i]);
+					rowData.sendTimes = 0;
+				
+					bl_project_assosms.rightGrid.addRowData(ids[i], rowData);
+					bl_project_assosms.leftGrid.delRowData(ids[i]);
+				}
+			});
+		}
+	};
+	
+	bl_project_assosms.delAssoSmsSingle = function(){
+		var smsId = bl_project_assosms.rightGrid.getGridParam('selrow');
+		if(smsId){
+			$.get(bl_project_assosms.deAssociateSmsChannel_url, {projectId: bl_project_assosms.projectId,smsChannelId: smsId}, function(){
+				var rowData = bl_project_assosms.rightGrid.getRowData(smsId);
+				
+				bl_project_assosms.leftGrid.addRowData(smsId, rowData);
+				bl_project_assosms.rightGrid.delRowData(smsId);
+			});
+		}
+	};
+	
+	bl_project_assosms.delAssoSmsAll = function(){
+		var smsIds = bl_project_assosms.rightGrid.getDataIDs() + "";
+		if(smsIds){
+			var ids = smsIds.split(",");
+			var param = $.param({projectId : bl_project_assosms.projectId, smsChannelId: ids}, true);
+			$.get(bl_project_assosms.deAssociateSmsChannel_url, param, function(){
+				for(var i = 0; i < ids.length; i++) {
+					var rowData = bl_project_assosms.rightGrid.getRowData(ids[i]);
+				
+					bl_project_assosms.leftGrid.addRowData(ids[i], rowData);
+					bl_project_assosms.rightGrid.delRowData(ids[i]);
+				}
+			});
+		}
+	};
+	
+	$().ready(function(){
+		bl_project_assosms.leftGrid = $("#bl_project_assosms_avai").jqGrid( {
+			url : bl_project_assosms.getAvaibleSmsChannel_url,
+			datatype : 'xml',
+			loadonce: true,
+			mtype : 'GET',
+			colNames : [ '', '', '业务名称' ],
+			colModel : [ 
+						{name : 'act',index : 'act', width:100,sortable:false, search:false},
+						{name : 'id',index : 'id',hidden : true,editable : true,editoptions : {defaultValue : ''}},
+					    {name : 'businessName',index : 'businessName',width : 200,align : 'right'} 
+			],
+			rownumbers : true,
+			gridview : true,
+			ondblClickRow: bl_project_assosms.assoSmsSingle,
+			caption : '可关联短信通道',
+			height : 300
+		});
+		bl_project_assosms.leftGrid.hideCol(['act']);
+		bl_project_assosms.leftGrid.filterToolbar( {} );
+		
+		bl_project_assosms.rightGrid = $("#bl_project_assosms_asso").jqGrid( {
+			url : bl_project_assosms.getAssociateSmsChannel_url,
+			datatype : 'xml',
+			loadonce: true,
+			mtype : 'GET',
+			colNames : [ '操作', '', '业务名称', '发送次数' ],
+			colModel : [ 
+						{name : 'act',index : 'act', width:110,sortable:false, search:false},
+						{name : 'id',index : 'id',hidden : true, editable : false},
+					    {name : 'businessName',index : 'businessName', editable : false, width : 200,align : 'right'}, 
+					    {name : 'sendTimes',index : 'sendTimes', editable: true, width : 80,align : 'right',editrules : {number : true}} 
+			],
+			onSelectRow: function(id){
+				if(id){
+					jQuery('#bl_project_assosms_asso').jqGrid('restoreRow',bl_project_assosms.lastsel2); 
+					jQuery('#bl_project_assosms_asso').jqGrid('editRow',id,false); 
+					bl_project_assosms.lastsel2 = id;
+					var url = (bl_project_assosms.updateSendTimes_url + "&smsChannelId=" + id);
+					bl_project_assosms.rightGrid.setGridParam({editurl: url});
+				}
+			},
+			ondblClickRow: bl_project_assosms.delAssoSmsSingle,
+			gridComplete: function(){
+				var ids = jQuery("#bl_project_assosms_asso").jqGrid('getDataIDs');
+				for(var i=0;i < ids.length;i++){
+					var cl = ids[i];
+					var se = "<input style='height:22px;width:50px;' type='button' value='保存' onclick=\"jQuery('#bl_project_assosms_asso').saveRow('"+cl+"');\"  />"; 
+					var ce = "<input style='height:22px;width:50px;' type='button' value='取消' onclick=\"jQuery('#bl_project_assosms_asso').restoreRow('"+cl+"');\" />"; 
+					jQuery("#bl_project_assosms_asso").jqGrid('setRowData',ids[i],{act:se+ce});
+				}	
+			},
+			rownumbers : true,
+			editurl: bl_project_assosms.updateSendTimes_url,
+			gridview : true,
+			caption : '已关联短信通道',
+			height : 300
+		});
+		bl_project_assosms.rightGrid.filterToolbar( {} );
+	});
+    
+</script>

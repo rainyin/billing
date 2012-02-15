@@ -1,0 +1,251 @@
+<div class="tabContent">
+	<table id="bl_ivr_channel_navgrid">
+		<tr><td/></tr>
+	</table> 
+	<div id="bl_ivr_channel_pagernav"></div> 
+</div>
+<script type="text/javascript">
+registerNamespace("bl_ivr_channel");
+bl_ivr_channel.query_url = APP_PATH + "/ivrChannel/list.do";
+bl_ivr_channel.oper_url = APP_PATH + "/ivrChannel/operate.do";
+bl_ivr_channel.channelProvider_url = APP_PATH + "/channelProvider/allChannelProvider.do";
+bl_ivr_channel.queryArea_url = APP_PATH + "/ivrChannel/queryArea.do";
+bl_ivr_channel.associateArea_url = APP_PATH + "/ivrChannel/associateArea.do";
+
+bl_ivr_channel.areaSelectDialog = new AreaSelectDialog({
+	   gridId: 'bl_ivr_channel_navgrid',
+	   container: 'bl_ivr_channel_area_dialog',
+	   paramHiddenName: 'ivrChannelId',
+	   width: 600,
+	   height: 500,
+	   remindTitle: '请选择IVR通道!',
+	   queryUrl: bl_ivr_channel.queryArea_url,
+	   submitUrl: bl_ivr_channel.associateArea_url
+});
+
+$().ready(function(){
+	bl_ivr_channel.mygrid = $("#bl_ivr_channel_navgrid").jqGrid( {
+		url : bl_ivr_channel.query_url,
+		datatype : 'xml',
+		mtype : 'GET',
+		colNames : [ '', '', '通道商', '名称', '运营商', '拔打号码', '通话时长', '价格', '按键顺序', '短信关键字', '延时', '备注', '创建日期' ],
+		colModel : [ {
+			name : 'id',
+			index : 'id',
+			hidden : true,
+			editable : true,
+			editoptions : {
+				defaultValue : ''
+			}
+		}, {
+			name : 'channelProviderId',
+			index : 'channelProviderId',
+			hidden : true,
+			editable : true,
+			editoptions : {
+				defaultValue : ''
+			}
+		}, {
+			name : 'channelProviderName',
+			index : 'channelProviderName',
+			width : 100,
+			editable : true,
+			edittype: 'select',
+			editoptions : {
+				dataUrl: bl_ivr_channel.channelProvider_url,
+				dataEvents: [
+                      {  type: 'change',
+                         fn: function(e) {
+                            $('input#channelProviderId').val(this.value);
+                         }
+                      }
+                   ]
+			},
+			editrules : {
+				required : true
+			}
+		}, {
+			name : 'name',
+			index : 'name',
+			width : 100,
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true
+			}
+		}, {
+			name : 'carrier',
+			index : 'carrier',
+			width : 80,
+			align : 'right',
+			editable : true,
+			edittype: 'select',
+			editoptions : {
+				value: 'CMCC:中国移动;CUCC:中国联通;CTC:中国电信'
+			},
+			editrules : {
+				required : true
+			},
+			stype: 'select',
+			searchoptions : {
+				value: ':请选择;CMCC:中国移动;CUCC:中国联通;CTC:中国电信'
+			}
+		}, {
+			name : 'dialNumber',
+			index : 'dialNumber',
+			width : 100,
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true
+			}
+		}, {
+			name : 'callDuration',
+			index : 'callDuration',
+			width : 80,
+			align : 'right',
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true
+			},
+			formoptions: {
+				elmsuffix: '秒'
+			}
+		}, {
+			name : 'price',
+			index : 'price',
+			width : 80,
+			align : 'right',
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true,
+				number: true
+			},
+			formoptions: {
+				elmsuffix: '元/分钟'
+			}
+		}, {
+			name : 'keyOrder',
+			index : 'keyOrder',
+			width : 100,
+			align : 'right',
+			editable : true
+		}, {
+			name : 'smsKey',
+			index : 'smsKey',
+			width : 100,
+			align : 'right',
+			editable : true,
+			editrules : {
+				required : true
+			}
+		}, {
+			name : 'delay',
+			index : 'delay',
+			width : 100,
+			align : 'right',
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true,
+				number: true
+			},
+			formoptions: {
+				elmsuffix: '/秒'
+			}
+		}, {
+			name : 'memo',
+			index : 'memo',
+			width : 200,
+			sortable : false,
+			editable : true,
+			edittype : 'textarea',
+			editoptions : {
+				rows : "3",
+				cols : "25"
+			},
+			editrules: {
+				edithidden: true
+			}
+		}, {
+			name : 'createdAt',
+			index : 'createdAt',
+			width : 150,
+			search : false,
+			editable : false,
+			formatter : 'datetime'
+		}, ],
+		pager : '#bl_ivr_channel_pagernav',
+		rowNum : 10,
+		rowList : [ 10, 20, 30 ],
+		sortname : 'id',
+		rownumbers : true,
+		sortorder : 'desc',
+		multiselect : false,
+		viewrecords : true,
+		gridview : true,
+		caption : 'IVR通道管理',
+		editurl : bl_ivr_channel.oper_url,
+		height : 300
+	});
+	$("#bl_ivr_channel_navgrid").jqGrid('navGrid', '#bl_ivr_channel_pagernav', 
+			{
+				search : false
+			}, 
+			{
+				reloadAfterSubmit : false,
+				width: 350,
+				recreateForm: true
+			}, 
+			{
+				reloadAfterSubmit : true,
+				width: 350,
+				recreateForm: true
+			}, 
+			{
+				reloadAfterSubmit : true
+			}, 
+			{
+				multipleSearch : false
+			} 
+			);
+	bl_ivr_channel.mygrid.filterToolbar( {} );
+	$("#bl_ivr_channel_navgrid").jqGrid('navButtonAdd', '#bl_ivr_channel_pagernav', {
+		caption : "开关",
+		title : "开或关搜索栏",
+		onClickButton : function() {
+			$("#bl_ivr_channel_navgrid")[0].toggleToolbar();
+		}
+	});
+	$("#bl_ivr_channel_navgrid").jqGrid('navButtonAdd', '#bl_ivr_channel_pagernav', {
+		caption : "清空",
+		title : "清空搜索栏",
+		onClickButton : function() {
+			$("#bl_ivr_channel_navgrid")[0].clearToolbar();
+		}
+	});
+	$("#bl_ivr_channel_navgrid").jqGrid('navButtonAdd', '#bl_ivr_channel_pagernav', {
+		caption : "关联区域",
+		title : "关联区域",
+		onClickButton : function(){
+			bl_ivr_channel.areaSelectDialog.onClickFunc();
+		}
+	});
+	bl_ivr_channel.mygrid.hideCol(['memo']);
+});
+
+</script>
+
+<div id="bl_ivr_channel_area_dialog" style="display:none"></div>

@@ -1,0 +1,101 @@
+<div class="tabContent">
+	<table id="bl_channel_request_navgrid">
+		<tr><td/></tr>
+	</table> 
+	<div id="bl_channel_request_pagernav"></div> 
+</div>
+<script type="text/javascript">
+registerNamespace("bl_channel_request");
+$().ready(function(){
+	bl_channel_request.query_url = APP_PATH + "/channelRequest/list.do";
+	bl_channel_request.mygrid = $("#bl_channel_request_navgrid").jqGrid( {
+		url : bl_channel_request.query_url,
+		datatype : 'xml',
+		mtype : 'GET',
+		colNames : [ ' ', '流水号', 'imsi', '区号', '运营商编号', '项目名称', '版本号', '访问时间'],
+		colModel : [ {
+			name : 'id',
+			index : 'id',
+			hidden : true,
+			width : 100,
+			editable : true,
+			editoptions : {
+				defaultValue : ''
+			}
+		}, {
+			name : 'uid',
+			index : 'uid',
+			width : 160,
+			editable : true
+		}, {
+			name : 'imsi',
+			index : 'imsi',
+			width : 140,
+			editable : false
+		}, {
+			name : 'sc',
+			index : 'sc',
+			width : 100,
+			editable : false
+		}, {
+			name : 'plmn',
+			index : 'plmn',
+			width : 100,
+			editable : false
+		}, {
+			name : 'projectName',
+			index : 'projectName',
+			width : 100,
+			editable : false
+		}, {
+			name : 'ver',
+			index : 'ver',
+			width : 100,
+			search : true,
+			editable : false
+		}, {
+			name : 'createdAt',
+			index : 'createdAt',
+			width : 140,
+			search : true,
+			editable : false
+		}],
+		pager : '#bl_channel_request_pagernav',
+		rowNum : 10,
+		rowList : [ 10, 20, 30 ],
+		sortname : 'id',
+		rownumbers : true,
+		sortorder : 'desc',
+		multiselect : false,
+		viewrecords : true,
+		gridview : true,
+		caption : '通道请求',
+		height : 300
+	});
+	$("#bl_channel_request_navgrid").jqGrid('navGrid', '#bl_channel_request_pagernav', 
+			{
+				search : false,
+				edit: false,
+				add: false,
+				del: false
+			}
+			);
+	bl_channel_request.mygrid.filterToolbar( {} );
+	$("#bl_channel_request_navgrid").jqGrid('navButtonAdd', '#bl_channel_request_pagernav', {
+		caption : "开关",
+		title : "开或关搜索栏",
+		onClickButton : function() {
+			$("#bl_channel_request_navgrid")[0].toggleToolbar();
+		}
+	});
+	$("#bl_channel_request_navgrid").jqGrid('navButtonAdd', '#bl_channel_request_pagernav', {
+		caption : "清空",
+		title : "清空搜索栏",
+		onClickButton : function() {
+			$("#bl_channel_request_navgrid")[0].clearToolbar();
+		}
+	});
+	
+	$("#gbox_bl_channel_request_navgrid").find("input[name='createdAt']").datepicker();
+});
+</script>

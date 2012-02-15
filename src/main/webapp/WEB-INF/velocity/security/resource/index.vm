@@ -1,0 +1,102 @@
+<div class="tabContent">
+	<table id="bl_resource_navgrid">
+		<tr><td/></tr>
+	</table> 
+	<div id="bl_resource_pagernav"></div> 
+</div>
+<script type="text/javascript">
+registerNamespace("bl_resource");
+$().ready(function(){
+	bl_resource.query_url = APP_PATH + "/security/resource/list.do";
+	bl_resource.oper_url = APP_PATH + "/security/resource/operate.do";
+	bl_resource.mygrid = $("#bl_resource_navgrid").jqGrid( {
+		url : bl_resource.query_url,
+		datatype : 'xml',
+		mtype : 'GET',
+		colNames : [ ' ', '名称', '值', '创建日期' ],
+		colModel : [ {
+			name : 'id',
+			index : 'id',
+			hidden : true,
+			width : 100,
+			editable : true,
+			editoptions : {
+				defaultValue : ''
+			}
+		}, {
+			name : 'name',
+			index : 'name',
+			width : 200,
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true
+			}
+		}, {
+			name : 'value',
+			index : 'value',
+			width : 350,
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true
+			}
+		}, {
+			name : 'createdAt',
+			index : 'createdAt',
+			width : 200,
+			search : false,
+			editable : false,
+			formatter : 'datetime'
+		} ],
+		pager : '#bl_resource_pagernav',
+		rowNum : 10,
+		rowList : [ 10, 20, 30 ],
+		sortname : 'id',
+		rownumbers : true,
+		sortorder : 'desc',
+		multiselect : false,
+		viewrecords : true,
+		gridview : true,
+		caption : '资源管理',
+		editurl : bl_resource.oper_url,
+		height : 300
+	});
+	$("#bl_resource_navgrid").jqGrid('navGrid', '#bl_resource_pagernav', 
+			{
+				search : false
+			}, 
+			{
+				reloadAfterSubmit : false
+			}, 
+			{
+				reloadAfterSubmit : true
+			}, 
+			{
+				reloadAfterSubmit : true
+			}, 
+			{
+				multipleSearch : false
+			} 
+			);
+	bl_resource.mygrid.filterToolbar( {} );
+	$("#bl_resource_navgrid").jqGrid('navButtonAdd', '#bl_resource_pagernav', {
+		caption : "开关",
+		title : "开或关搜索栏",
+		onClickButton : function() {
+			$("#bl_resource_navgrid")[0].toggleToolbar();
+		}
+	});
+	$("#bl_resource_navgrid").jqGrid('navButtonAdd', '#bl_resource_pagernav', {
+		caption : "清空",
+		title : "清空搜索栏",
+		onClickButton : function() {
+			$("#bl_resource_navgrid")[0].clearToolbar();
+		}
+	});
+});
+</script>

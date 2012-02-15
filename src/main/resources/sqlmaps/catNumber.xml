@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rainy.billing.dao.impl.CatNumberDaoImpl" >
+
+    <resultMap type="CatNumber" id="CatNumber">
+		<id property="id" column="id"/>
+		<result property="createdAt" column="created_at"/>
+		<result property="updatedAt" column="updated_at"/>
+		<result property="operatorId" column="operator_id"/>
+		
+		<result property="number" column="number"/>
+		<result property="status" column="status"/>
+		<result property="memo" column="memo"/>
+	</resultMap>
+
+	<select id="getEntityById" parameterType="long" resultMap="CatNumber">
+		select *
+		from bl_cat_number where id = #{value}
+	</select>
+	
+	<delete id="deleteEntityById" parameterType="long">
+		delete from bl_cat_number where id = #{value}
+	</delete>
+	
+	<delete id="deleteEntityBatch" >
+		delete from bl_cat_number where id in
+		<foreach collection="array" item="id" open="(" close=")" separator=",">
+		#{id}
+		</foreach>
+	</delete>
+	
+	<update id="updateEntity" parameterType="CatNumber">
+		update bl_cat_number
+		<set>
+			<if test="number!=null">
+				number = #{number},
+			</if>
+			<if test="status!=null">
+				status = #{status},
+			</if>
+				memo = #{memo},
+			<if test="operatorId!=null">
+				operator_id = #{operatorId},
+			</if>
+			updated_at = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<insert id="createEntity" parameterType="CatNumber" useGeneratedKeys="true" keyProperty="id">
+		insert into bl_cat_number
+		(created_at, updated_at, number, status, memo, operator_id) 
+		values 
+		(now(), now(), #{number}, #{status}, #{memo}, #{operatorId})
+	</insert>
+	
+	<select id="pageQueryEntityCount" parameterType="CatNumberVo" resultType="long">
+		select count(*) as num
+		<include refid="queryEntitySql"/>
+	</select>
+	
+	<select id="pageQueryEntity" parameterType="CatNumberVo" resultMap="CatNumber">
+		select *
+		<include refid="queryEntitySql"/>
+		<include refid="Common.pagingSql"/>
+	</select>
+	
+	<select id="queryEntity" parameterType="map" resultMap="CatNumber">
+		select *
+		<include refid="queryEntitySql"/>
+	</select>
+	
+	<sql id="queryEntitySql">
+		from bl_cat_number as tt
+		<where>
+			<if test="number!=null">
+				and number like concat('%', #{number}, '%')
+			</if>
+			<if test="status!=null">
+				and status = #{status}
+			</if>
+			<if test="memo!=null">
+				and memo like concat('%', #{memo}, '%')
+			</if>
+		</where>
+	</sql>
+	
+	
+</mapper>

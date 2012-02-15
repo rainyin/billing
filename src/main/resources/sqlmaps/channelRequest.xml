@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rainy.billing.dao.impl.ChannelRequestDaoImpl" >
+
+    <resultMap type="ChannelRequest" id="ChannelRequest">
+		<id property="id" column="id"/>
+		<result property="createdAt" column="created_at"/>
+		<result property="updatedAt" column="updated_at"/>
+		<result property="operatorId" column="operator_id"/>
+		
+		<result property="imsi" column="imsi"/>
+		<result property="projectId" column="project_id"/>
+		<result property="projectName" column="project_name"/>
+		<result property="uid" column="uid"/>
+		<result property="sc" column="sc"/>
+		<result property="plmn" column="plmn"/>
+		<result property="ver" column="ver"/>
+	</resultMap>
+
+	<select id="getEntityById" parameterType="long" resultMap="ChannelRequest">
+		select * from bl_channel_request where id = #{value}
+	</select>
+	
+	<delete id="deleteEntityById" parameterType="long">
+		delete from bl_channel_request where id = #{value}
+	</delete>
+	
+	<delete id="deleteEntityBatch">
+		delete from bl_channel_request where id in
+		<foreach collection="array" item="id" open="(" close=")" separator=",">
+		#{id}
+		</foreach>
+	</delete>
+	
+	<update id="updateEntity" parameterType="ChannelRequest">
+		update bl_channel_request
+		<set>
+			<if test="operatorId!=null">
+				operator_id = #{operatorId},
+			</if>
+			<if test="sc!=null">
+				sc = #{sc},
+			</if>
+			<if test="plmn!=null">
+				plmn = #{plmn},
+			</if>
+			<if test="imsi!=null">
+				imsi = #{imsi},
+			</if>
+			<if test="ver!=null">
+				ver = #{ver},
+			</if>
+			<if test="projectName!=null">
+				project_name = #{projectName},
+			</if>
+			<if test="projectId!=null">
+				project_id = #{projectId},
+			</if>
+			updated_at = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+	<insert id="createEntity" parameterType="ChannelRequest" useGeneratedKeys="true" keyProperty="id">
+		insert into bl_channel_request 
+		(created_at, updated_at, operator_id, imsi, project_id, project_name, uid, sc, plmn, ver) 
+		values 
+		(now(), now(), #{operatorId}, #{imsi}, #{projectId}, #{projectName}, #{uid}, #{sc}, #{plmn}, #{ver})
+	</insert>
+	
+	<select id="pageQueryEntityCount" parameterType="ChannelRequestVo" resultType="long">
+		select count(*) as num
+		<include refid="queryEntitySql"/>
+	</select>
+	
+	<select id="pageQueryEntity" parameterType="ChannelRequestVo" resultMap="ChannelRequest">
+		select tt.*
+		<include refid="queryEntitySql"/>
+		<include refid="Common.pagingSql"/>
+	</select>
+	
+	<select id="queryEntity" parameterType="map" resultMap="ChannelRequest">
+		select tt.* from bl_channel_request as tt where imsi = #{imsi}
+	</select>
+	
+	<sql id="queryEntitySql">
+		from bl_channel_request as tt
+		<where>
+			<if test="imsi!=null">
+				and imsi like concat('%', #{imsi}, '%')
+			</if>
+			<if test="sc!=null">
+				and sc = #{sc}
+			</if>
+			<if test="plmn!=null">
+				and plmn = #{plmn}
+			</if>
+			<if test="projectName!=null">
+				and project_name = #{projectName}
+			</if>
+			<if test="uid!=null">
+				and uid like concat('%', #{uid}, '%')
+			</if>
+			<if test="ver!=null">
+				and ver like concat('%', #{ver}, '%')
+			</if>
+			<if test="ver!=null">
+				and ver like concat('%', #{ver}, '%')
+			</if>
+			<if test="createdAt!=null">
+				and date(created_at) <![CDATA[=]]> #{createdAt}
+			</if>
+		</where>
+	</sql>
+	
+</mapper>

@@ -1,0 +1,116 @@
+<div class="tabContent">
+	<table id="bl_terminal_navgrid">
+		<tr><td/></tr>
+	</table> 
+	<div id="bl_terminal_pagernav"></div> 
+</div>
+<script type="text/javascript">
+registerNamespace("bl_terminal");
+$().ready(function(){
+	bl_terminal.query_url = APP_PATH + "/terminal/list.do";
+	bl_terminal.mygrid = $("#bl_terminal_navgrid").jqGrid( {
+		url : bl_terminal.query_url,
+		datatype : 'xml',
+		mtype : 'GET',
+		colNames : [ ' ', 'uid', 'imsi',  '手机号', '项目名称', '运营商编码', '区号', '短信猫号码', '版本号', '创建时间', '更新时间'],
+		colModel : [ {
+			name : 'id',
+			index : 'id',
+			hidden : true,
+			width : 100,
+			editable : true,
+			editoptions : {
+				defaultValue : ''
+			}
+		}, {
+			name : 'uid',
+			index : 'uid',
+			width : 160,
+			editable : false
+		}, {
+			name : 'imsi',
+			index : 'imsi',
+			width : 100,
+			editable : false
+		}, {
+			name : 'number',
+			index : 'number',
+			width : 100,
+			editable : false
+		}, {
+			name : 'projectName',
+			index : 'projectName',
+			width : 100,
+			editable : false
+		}, {
+			name : 'carrier',
+			index : 'carrier',
+			width : 80,
+			editable : false
+		}, {
+			name : 'areaCode',
+			index : 'areaCode',
+			width : 80,
+			editable : false
+		}, {
+			name : 'catNumber',
+			index : 'catNumber',
+			width : 100,
+			editable : true
+		}, {
+			name : 'version',
+			index : 'version',
+			width : 80,
+			editable : true
+		}, {
+			name : 'createdAt',
+			index : 'createdAt',
+			width : 100,
+			search : true,
+			editable : false
+		}, {
+			name : 'updatedAt',
+			index : 'updatedAt',
+			width : 100,
+			search : true,
+			editable : false
+		}],
+		pager : '#bl_terminal_pagernav',
+		rowNum : 10,
+		rowList : [ 10, 20, 30 ],
+		sortname : 'id',
+		sortorder : 'desc',
+		multiselect : false,
+		viewrecords : true,
+		gridview : true,
+		caption : '注册用户',
+		height : 300
+	});
+	$("#bl_terminal_navgrid").jqGrid('navGrid', '#bl_terminal_pagernav', 
+			{
+				search : false,
+				edit: false,
+				add: false,
+				del: false
+			}
+			);
+	bl_terminal.mygrid.filterToolbar( {} );
+	$("#bl_terminal_navgrid").jqGrid('navButtonAdd', '#bl_terminal_pagernav', {
+		caption : "开关",
+		title : "开或关搜索栏",
+		onClickButton : function() {
+			$("#bl_terminal_navgrid")[0].toggleToolbar();
+		}
+	});
+	$("#bl_terminal_navgrid").jqGrid('navButtonAdd', '#bl_terminal_pagernav', {
+		caption : "清空",
+		title : "清空搜索栏",
+		onClickButton : function() {
+			$("#bl_terminal_navgrid")[0].clearToolbar();
+		}
+	});
+	
+	$("#gbox_bl_terminal_navgrid").find("input[name='createdAt']").datepicker();
+	$("#gbox_bl_terminal_navgrid").find("input[name='updatedAt']").datepicker();
+});
+</script>

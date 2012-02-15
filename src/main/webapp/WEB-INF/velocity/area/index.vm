@@ -1,0 +1,68 @@
+<div class="tabContent">
+	<table id="bl_area_navgrid">
+		<tr><td/></tr>
+	</table> 
+	<div id="bl_area_pagernav"></div> 
+</div>
+<script type="text/javascript">
+registerNamespace("bl_area");
+$().ready(function(){
+	bl_area.query_url = APP_PATH + "/area/list.do";
+	bl_area.oper_url = APP_PATH + "/area/operate.do";
+	bl_area.mygrid = $("#bl_area_navgrid").jqGrid( {
+		url : bl_area.query_url,
+		treeGrid: true,
+	    treeGridModel: 'adjacency',
+	    ExpandColumn : 'name',
+		forceFit: true,
+		datatype: "xml",
+		width: 850,
+		mtype : 'GET',
+		colNames : [ 'id', '名称', '移动区号', '联通区号', 'parentId', 'areaLink', '创建日期' ],
+		colModel : [
+		 { name : 'id', index : 'id', key : true, hidden : true, width : 100, editable : true, editoptions : {defaultValue : ''} },
+		 { name : 'name', index : 'name', width : 150, editable : true, editoptions : {size : 20 },editrules : {required : true} },
+	     { name : 'cmCode', index : 'cmCode', width : 100, editable : true, editoptions : { size : 20, maxlength: 5}, editrules : { required : true} },
+	     { name : 'cuCode', index : 'cuCode', width : 100, editable : true, editoptions : { size : 20, maxlength: 5}, editrules : { required : true} },
+	     { name : 'parentId', index : 'parentId', hidden : true, width : 100, editable : true, editoptions : {defaultValue : ''} },
+	     { name : 'areaLink', index : 'areaLink', hidden : true, width : 100, editable : true, editoptions : {defaultValue : ''} },
+		 { name : 'createdAt', index : 'createdAt',width : 150, search : false} 
+		],
+		pager : '#bl_area_pagernav',
+		caption : '区域管理',
+		editurl : bl_area.oper_url,
+		sortable: true,
+		height : 450
+	});
+	$("#bl_area_navgrid").jqGrid('navGrid', '#bl_area_pagernav', 
+			{
+				search : false
+			}, 
+			{
+				reloadAfterSubmit : false,
+				onClose: function(){ bl_area.mygrid.resetSelection(); },
+				closeAfterEdit: true
+			}, 
+			{
+				reloadAfterSubmit : true,
+				afterShowForm : function(){
+					var selId = jQuery("#bl_area_navgrid").jqGrid('getGridParam','selrow');
+					var parentId = '';
+					var areaLink = '';
+					if(selId){
+						var selRow = bl_area.mygrid.getRowData(selId);
+						parentId = selId;
+						areaLink = selRow.areaLink;
+					} 
+					$('input#parentId').val(parentId);
+					$('input#areaLink').val(areaLink);
+				},
+				onClose: function(){ bl_area.mygrid.resetSelection(); },
+				closeAfterAdd: true
+			}, 
+			{
+				reloadAfterSubmit : false
+			}
+	);
+});
+</script>

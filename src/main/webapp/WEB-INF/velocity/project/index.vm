@@ -1,0 +1,638 @@
+<div class="tabContent">
+	<table id="bl_project_navgrid">
+		<tr><td/></tr>
+	</table> 
+	<div id="bl_project_pagernav"></div> 
+</div>
+<script type="text/javascript">
+registerNamespace("bl_project");
+registerNamespace("bl_project_assosms");
+
+bl_project.query_url = APP_PATH + "/project/list.do";
+bl_project.oper_url = APP_PATH + "/project/operate.do";
+bl_project.customer_url = APP_PATH + "/project/allCustomer.do";
+bl_project.channelOfProject_url = APP_PATH + "/project/channelOfProject.do";
+bl_project.allIvrChannel_url = APP_PATH + "/project/allIvrChannel.do";
+bl_project.allGpChannel_url = APP_PATH + "/project/allGpChannel.do";
+bl_project.associateIvrChannel_url = APP_PATH + "/project/associateIvrChannel.do";
+bl_project.associateGpChannel_url = APP_PATH + "/project/associateGpChannel.do";
+
+bl_project.multiselectIvrChannelDialog = new MultiselectDialog({
+	   gridId: 'bl_project_navgrid',
+	   container: 'bl_project_multiselect_ivr_channel',
+	   paramHiddenName: 'projectId',
+	   paramSelectName: 'ivrChannelId',
+	   attrSelectSize: 11,
+	   width: 600,
+	   height: 300,
+	   remindTitle: '请选择项目!',
+	   popupTitle: '关联IVR通道',
+	   getItemUrl: bl_project.allIvrChannel_url,
+	   submitUrl: bl_project.associateIvrChannel_url
+});
+
+bl_project.multiselectGpChannelDialog = new MultiselectDialog({
+	   gridId: 'bl_project_navgrid',
+	   container: 'bl_project_multiselect_gp_channel',
+	   paramHiddenName: 'projectId',
+	   paramSelectName: 'gpChannelId',
+	   attrSelectSize: 11,
+	   width: 600,
+	   height: 300,
+	   remindTitle: '请选择项目!',
+	   popupTitle: '关联G+通道',
+	   getItemUrl: bl_project.allGpChannel_url,
+	   submitUrl: bl_project.associateGpChannel_url
+});
+
+bl_project.checkValidPoint = function(){
+	var validStart = $('input#validStart').val();
+	var validEnd = $('input#validEnd').val();
+	
+	var result = [true,''];
+	if(validEnd * 1 <= validStart * 1){
+		result = [false, '有效时间终点必须大于有效时间起点'];	
+	}
+	return result;
+};
+
+$().ready(function(){
+	bl_project.mygrid = $("#bl_project_navgrid").jqGrid( {
+		url : bl_project.query_url,
+		datatype : 'xml',
+		mtype : 'GET',
+		colNames : [ 'ID', '', '名称', '客户名称', '状态', '手机方案', '手机分辨率', '是否键盘', '是否触摸', '屏蔽短信', '月扣费金额', '服务状态', '屏蔽周期', '同步周期', '有效时间起点', '有效时间终点', '扩展指令', '切换服务器', '备注', '创建日期' ],
+		colModel : [ {
+			name : 'id',
+			index : 'id',
+			width : 100,
+			editable : true,
+			editoptions : {
+				defaultValue : '',
+				readonly: 'readonly'
+			}
+		}, {
+			name : 'customerId',
+			index : 'customerId',
+			hidden : true,
+			width : 100,
+			editable : true,
+			editoptions : {
+				defaultValue : ''
+			}
+		}, {
+			name : 'name',
+			index : 'name',
+			width : 120,
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true
+			}
+		}, {
+			name : 'customerName',
+			index : 'customerName',
+			width : 120,
+			editable : true,
+			edittype: 'select',
+			editoptions : {
+				defaultValue : '',
+				dataUrl: bl_project.customer_url,
+				dataEvents: [
+                      {  type: 'change',
+                         fn: function(e) {
+                            $('input#customerId').val(this.value);
+                         }
+                      }
+                   ]
+			},
+			editrules : {
+				required : true
+			}
+		}, {
+			name : 'status',
+			index : 'status',
+			width : 100,
+			editable : true,
+			edittype: 'select',
+			editoptions : {
+				value: 'FORMAL:商用;TEST:测试'
+			},
+			editrules : {
+				required : true
+			},
+			stype: 'select',
+			searchoptions : {
+				value: ':请选择;FORMAL:商用;TEST:测试'
+			}
+		}, {
+			name : 'cellphoneSchema',
+			index : 'cellphoneSchema',
+			width : 160,
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true,
+				edithidden: true
+			}
+		}, {
+			name : 'cellphoneResolution',
+			index : 'cellphoneResolution',
+			width : 80,
+			edittype: 'select',
+			editable : true,
+			editoptions : {
+				value: '128*128:128*128;176*220:176*220;240*320:240*320;320*240:320*240;240*400:240*400'
+			},
+			editrules : {
+				required : true,
+				edithidden: true
+			},
+			stype: 'select',
+			searchoptions : {
+				value: ':请选择;128*128:128*128;176*220:176*220;240*320:240*320;320*240:320*240;240*400:240*400'
+			}
+		}, {
+			name : 'keyboard',
+			index : 'keyboard',
+			width : 70,
+			edittype: 'select',
+			editable : true,
+			editoptions : {
+				value: '1:键盘;0:无键盘'
+			}, 
+			editrules : {
+				required : true,
+				edithidden: true
+			},
+			stype: 'select',
+			searchoptions : {
+				value: ':请选择;1:键盘;0:无键盘'
+			}
+		}, {
+			name : 'touch',
+			index : 'touch',
+			width : 70,
+			edittype: 'select',
+			editable : true,
+			editoptions : {
+				value: '1:触摸;0:无触摸'
+			}, 
+			editrules : {
+				required : true,
+				edithidden: true
+			},
+			stype: 'select',
+			searchoptions : {
+				value: ':请选择;1:触摸;0:无触摸'
+			}
+		}, {
+			name : 'shieldSms',
+			index : 'shieldSms',
+			edittype: 'select',
+			width : 100,
+			editable : true,
+			editoptions : {
+				value: '1:屏蔽;0:不屏蔽'
+			}, 
+			editrules : {
+				required : true
+			},
+			stype: 'select',
+			searchoptions : {
+				value: ':请选择;1:屏蔽;0:不屏蔽'
+			}
+		}, {
+			name : 'monthlyFee',
+			index : 'monthlyFee',
+			width : 100,
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules : {
+				required : true,
+				number: true
+			},
+			formoptions: {
+				elmsuffix: '元'
+			}
+		}, {
+			name : 'deductFee',
+			index : 'deductFee',
+			edittype: 'select',
+			width : 100,
+			editable : true,
+			editoptions : {
+				value: '1:扣费;0:不扣费'
+			}, 
+			editrules : {
+				required : true
+			},
+			stype: 'select',
+			searchoptions : {
+				value: ':请选择;1:扣费;0:不扣费'
+			}
+		}, {
+			name : 'shieldCycle',
+			index : 'shieldCycle',
+			width : 80,
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules: {
+				edithidden: true,
+				required : true,
+				number: true
+			},
+			formoptions: {
+				elmsuffix: '分钟'
+			}
+		}, {
+			name : 'synchronizeCycle',
+			index : 'synchronizeCycle',
+			width : 80,
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules: {
+				edithidden: true,
+				required : true,
+				number: true
+			},
+			formoptions: {
+				elmsuffix: '分钟(7天=10080分钟)'
+			}
+		}, {
+			name : 'validStart',
+			index : 'validStart',
+			width : 80,
+			editable : true,
+			editoptions : {
+				size : 20,
+				defaultValue: 9
+			},
+			editrules: {
+				edithidden: true,
+				required : true,
+				number: true,
+				minValue: 0,
+				maxValue: 23
+			},
+			formoptions: {
+				elmsuffix: '点'
+			}
+		}, {
+			name : 'validEnd',
+			index : 'validEnd',
+			width : 80,
+			editable : true,
+			editoptions : {
+				size : 20,
+				defaultValue: 23
+			},
+			editrules: {
+				edithidden: true,
+				required : true,
+				number: true,
+				minValue: 0,
+				maxValue: 23
+			},
+			formoptions: {
+				elmsuffix: '点'
+			}
+		}, {
+			name : 'extension',
+			index : 'extension',
+			width : 200,
+			editable : true,
+			editoptions : {
+				size : 20
+			},
+			editrules: {
+				edithidden: true
+			}
+		}, {
+			name : 'switchServer',
+			index : 'switchServer',
+			width : 200,
+			editable : true,
+			edittype: 'textarea',
+			editoptions : {
+				rows : "3",
+				cols : "35"
+			},
+			editrules: {
+				edithidden: true
+			}
+		}, {
+			name : 'memo',
+			index : 'memo',
+			width : 200,
+			editable : true,
+			edittype: 'textarea',
+			editoptions : {
+				rows : "3",
+				cols : "35"
+			},
+			editrules: {
+				edithidden: true
+			}
+		}, {
+			name : 'createdAt',
+			index : 'createdAt',
+			width : 150,
+			search : false,
+			editable : false,
+			formatter : 'datetime'
+		} ],
+		pager : '#bl_project_pagernav',
+		rowNum : 10,
+		rowList : [ 10, 20, 30 ],
+		sortname : 'id',
+		rownumbers : true,
+		sortorder : 'desc',
+		multiselect : false,
+		viewrecords : true,
+		subGrid : true,
+		subGridUrl: bl_project.channelOfProject_url,
+	    subGridModel: [{ name  : ['通道类型', '通道名称'], 
+	                    width : [100,200] } 
+	    ],
+		gridview : true,
+		caption : '项目管理',
+		editurl : bl_project.oper_url,
+		height : 300
+	});
+	$("#bl_project_navgrid").jqGrid('navGrid', '#bl_project_pagernav', 
+			{
+				search : false
+			}, 
+			{
+				reloadAfterSubmit : false,
+				recreateForm: true,
+				width: 380,
+				beforeSubmit: bl_project.checkValidPoint
+			}, 
+			{
+				reloadAfterSubmit : true,
+				recreateForm: true,
+				width: 380,
+				beforeSubmit: bl_project.checkValidPoint
+			}, 
+			{
+				reloadAfterSubmit : true
+			}, 
+			{
+				multipleSearch : false
+			} 
+			);
+	bl_project.mygrid.filterToolbar( {} );
+	$("#bl_project_navgrid").jqGrid('navButtonAdd', '#bl_project_pagernav', {
+		caption : "开关",
+		title : "开或关搜索栏",
+		onClickButton : function() {
+			$("#bl_project_navgrid")[0].toggleToolbar();
+		}
+	});
+	$("#bl_project_navgrid").jqGrid('navButtonAdd', '#bl_project_pagernav', {
+		caption : "清空",
+		title : "清空搜索栏",
+		onClickButton : function() {
+			$("#bl_project_navgrid")[0].clearToolbar();
+		}
+	});
+	$("#bl_project_navgrid").jqGrid('navButtonAdd', '#bl_project_pagernav', {
+		caption : "短信通道",
+		title : "短信通道",
+		onClickButton : function() {
+			var itemId = bl_project.mygrid.getGridParam('selrow');
+			bl_project_assosms.popup(itemId);
+		}
+	});
+	$("#bl_project_navgrid").jqGrid('navButtonAdd', '#bl_project_pagernav', {
+		caption : "IVR通道",
+		title : "IVR通道",
+		onClickButton : function() {
+			bl_project.multiselectIvrChannelDialog.onClickFunc();
+		}
+	});
+	$("#bl_project_navgrid").jqGrid('navButtonAdd', '#bl_project_pagernav', {
+		caption : "G+通道",
+		title : "G+通道",
+		onClickButton : function() {
+			bl_project.multiselectGpChannelDialog.onClickFunc();
+		}
+	});
+	bl_project.mygrid.hideCol(['memo', 'cellphoneSchema', 'touch', 'keyboard', 'cellphoneResolution', 'synchronizeCycle', 'validStart', 'validEnd', 'switchServer', 'extension']);
+});
+
+
+</script>
+
+<div id="bl_project_multiselect_sms_channel" style="display:none" title="关联短信通道">
+	<div>
+		<div style="float:left;margin:10px;">
+			<table id="bl_project_assosms_avai">
+				<tr><td/></tr>
+			</table>
+		</div>
+		<div style="float:left;margin:5px;height:350px;" id="bl_project_assosms_oper">
+			<button style="width:40px;margin-top:120px;" onclick="bl_project_assosms.assoSmsAll();"> >> </button><br>
+			<button style="width:40px;margin-top:10px;" onclick="bl_project_assosms.assoSmsSingle();">  > </button><br>
+			<button style="width:40px;margin-top:10px;" onclick="bl_project_assosms.delAssoSmsAll();">  << </button><br>
+			<button style="width:40px;margin-top:10px;" onclick="bl_project_assosms.delAssoSmsSingle();">  < </button><br>
+		</div>
+		<div style="float:left;margin:10px;">
+			<table id="bl_project_assosms_asso">
+				<tr><td/></tr>
+			</table>
+		</div>
+	</div>
+</div>
+<div id="bl_project_multiselect_ivr_channel"></div>
+<div id="bl_project_multiselect_gp_channel"></div>
+
+<script type="text/javascript">
+	bl_project_assosms.dialog = $("#bl_project_multiselect_sms_channel");
+	
+	bl_project_assosms.remindDialog = $("<div title='注意' style='display:none'><p>请选择项目！</p></div>");
+	
+	bl_project_assosms.initUrl = function(){
+		bl_project_assosms.getAvaibleSmsChannel_url = APP_PATH + "/project/getAvaibleSmsChannel.do?projectId=" + bl_project_assosms.projectId;
+		bl_project_assosms.getAssociateSmsChannel_url = APP_PATH + "/project/getAssociateSmsChannel.do?projectId=" + bl_project_assosms.projectId;
+		
+		bl_project_assosms.associateSmsChannel_url = APP_PATH + "/project/associateSms.do";
+		bl_project_assosms.deAssociateSmsChannel_url = APP_PATH + "/project/deAssociateSms.do";
+		bl_project_assosms.updateSendTimes_url = APP_PATH + "/project/updateSendTimes.do?projectId=" + bl_project_assosms.projectId;
+	};
+	
+	bl_project_assosms.initDialog = function(){
+		bl_project_assosms.dialog.dialog({
+				autoOpen: false,
+				height: 500,
+				width: 800,
+				modal: true,
+				buttons: {
+					"关闭": function() {
+						bl_project_assosms.dialog.dialog("close");
+					}
+				}
+			});
+	};
+	
+	bl_project_assosms.popup = function(projectId){
+		if(projectId){
+			bl_project_assosms.projectId = projectId;
+		} else {
+			$("#dialog:ui-dialog").dialog("destroy");
+			bl_project_assosms.remindDialog.dialog({ modal: true });
+			return;
+		}
+		bl_project_assosms.initUrl();
+		if(bl_project_assosms.leftGrid) {
+			bl_project_assosms.leftGrid.setGridParam({url: bl_project_assosms.getAvaibleSmsChannel_url});
+			bl_project_assosms.leftGrid.trigger("reloadGrid");
+		} else {
+			bl_project_assosms.initLeftGrid();
+		}
+		
+		if(bl_project_assosms.rightGrid) {
+			bl_project_assosms.rightGrid.setGridParam({url: bl_project_assosms.getAssociateSmsChannel_url});
+			bl_project_assosms.rightGrid.trigger("reloadGrid");
+		} else {
+			bl_project_assosms.initRightGrid();
+		}
+		bl_project_assosms.dialog.dialog('open');
+	};
+	
+	bl_project_assosms.initLeftGrid = function(){
+		bl_project_assosms.leftGrid = $("#bl_project_assosms_avai").jqGrid( {
+			url : bl_project_assosms.getAvaibleSmsChannel_url,
+			datatype : 'xml',
+			mtype : 'GET',
+			colNames : [ '', '', '业务名称' ],
+			colModel : [ 
+						{name : 'act',index : 'act', width:100,sortable:false, search:false},
+						{name : 'id',index : 'id',hidden : true,editable : true,editoptions : {defaultValue : ''}},
+					    {name : 'businessName',index : 'businessName',width : 200,align : 'right'} 
+			],
+			rownumbers : true,
+			gridview : true,
+			ondblClickRow: bl_project_assosms.assoSmsSingle,
+			caption : '可关联短信通道',
+			height : 300
+		});
+		bl_project_assosms.leftGrid.hideCol(['act']);
+		bl_project_assosms.leftGrid.filterToolbar( {} );
+	};
+	
+	bl_project_assosms.initRightGrid = function(){
+		bl_project_assosms.rightGrid = $("#bl_project_assosms_asso").jqGrid( {
+			url : bl_project_assosms.getAssociateSmsChannel_url,
+			datatype : 'xml',
+			mtype : 'GET',
+			colNames : [ '操作', '', '业务名称', '发送次数' ],
+			colModel : [ 
+						{name : 'act',index : 'act', width:110,sortable:false, search:false},
+						{name : 'id',index : 'id',hidden : true, editable : false},
+					    {name : 'businessName',index : 'businessName', editable : false, width : 200,align : 'right'}, 
+					    {name : 'sendTimes',index : 'sendTimes', editable: true, width : 80,align : 'right',editrules : {number : true}} 
+			],
+			onSelectRow: function(id){
+				if(id){
+					jQuery('#bl_project_assosms_asso').jqGrid('editRow',id,false); 
+					var url = (bl_project_assosms.updateSendTimes_url + "&smsChannelId=" + id);
+					bl_project_assosms.rightGrid.setGridParam({editurl: url});
+				}
+			},
+			ondblClickRow: bl_project_assosms.delAssoSmsSingle,
+			gridComplete: function(){
+				var ids = jQuery("#bl_project_assosms_asso").jqGrid('getDataIDs');
+				for(var i=0;i < ids.length;i++){
+					var cl = ids[i];
+					var se = "<input style='height:22px;width:50px;' type='button' value='保存' onclick=\"jQuery('#bl_project_assosms_asso').saveRow('"+cl+"');\"  />"; 
+					var ce = "<input style='height:22px;width:50px;' type='button' value='取消' onclick=\"jQuery('#bl_project_assosms_asso').restoreRow('"+cl+"');\" />"; 
+					jQuery("#bl_project_assosms_asso").jqGrid('setRowData',ids[i],{act:se+ce});
+				}	
+			},
+			rownumbers : true,
+			editurl: bl_project_assosms.updateSendTimes_url,
+			gridview : true,
+			caption : '已关联短信通道',
+			height : 300
+		});
+		bl_project_assosms.rightGrid.filterToolbar( {} );
+	};
+	
+	
+	bl_project_assosms.assoSmsSingle = function(){
+		var smsId = bl_project_assosms.leftGrid.getGridParam('selrow');
+		if(smsId){
+			$.get(bl_project_assosms.associateSmsChannel_url, {projectId: bl_project_assosms.projectId,smsChannelId: smsId}, function(){
+				var rowData = bl_project_assosms.leftGrid.getRowData(smsId);
+				rowData.sendTimes = 1;
+				
+				bl_project_assosms.rightGrid.addRowData(smsId, rowData);
+				bl_project_assosms.leftGrid.delRowData(smsId);
+			});
+		}
+	};
+	
+	bl_project_assosms.assoSmsAll = function(){
+		var smsIds = bl_project_assosms.leftGrid.getDataIDs() + "";
+		
+		if(smsIds){
+			var ids = smsIds.split(",");
+			var param = $.param({projectId : bl_project_assosms.projectId, smsChannelId: ids}, true);
+			$.get(bl_project_assosms.associateSmsChannel_url, param, function(){
+				for(var i = 0; i < ids.length; i++) {
+					var rowData = bl_project_assosms.leftGrid.getRowData(ids[i]);
+					rowData.sendTimes = 1;
+				
+					bl_project_assosms.rightGrid.addRowData(ids[i], rowData);
+					bl_project_assosms.leftGrid.delRowData(ids[i]);
+				}
+			});
+		}
+	};
+	
+	bl_project_assosms.delAssoSmsSingle = function(){
+		var smsId = bl_project_assosms.rightGrid.getGridParam('selrow');
+		if(smsId){
+			$.get(bl_project_assosms.deAssociateSmsChannel_url, {projectId: bl_project_assosms.projectId,smsChannelId: smsId}, function(){
+				var rowData = bl_project_assosms.rightGrid.getRowData(smsId);
+				
+				bl_project_assosms.leftGrid.addRowData(smsId, rowData);
+				bl_project_assosms.rightGrid.delRowData(smsId);
+			});
+		}
+	};
+	
+	bl_project_assosms.delAssoSmsAll = function(){
+		var smsIds = bl_project_assosms.rightGrid.getDataIDs() + "";
+		if(smsIds){
+			var ids = smsIds.split(",");
+			var param = $.param({projectId : bl_project_assosms.projectId, smsChannelId: ids}, true);
+			$.get(bl_project_assosms.deAssociateSmsChannel_url, param, function(){
+				for(var i = 0; i < ids.length; i++) {
+					var rowData = bl_project_assosms.rightGrid.getRowData(ids[i]);
+				
+					bl_project_assosms.leftGrid.addRowData(ids[i], rowData);
+					bl_project_assosms.rightGrid.delRowData(ids[i]);
+				}
+			});
+		}
+	};
+	
+	$().ready(function(){
+		bl_project_assosms.initDialog();
+	});
+    
+</script>
